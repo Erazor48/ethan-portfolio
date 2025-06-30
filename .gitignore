@@ -1,0 +1,12 @@
+# Ignore les dossiers et fichiers générés par npm
+node_modules/
+
+# Ignore les fichiers spécifiques à tailwind (si nécessaire)
+.next/
+build/
+
+# Ignore les fichiers temporaires ou de cache
+.DS_Store
+npm-debug.log
+yarn-debug.log
+yarn-error.log
