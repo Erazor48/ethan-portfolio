@@ -1,5 +1,6 @@
 // components/Hero.tsx
-import { GithubIcon, Linkedin, FileText } from "lucide-react";
+import { TbFileCv } from "react-icons/tb";
+import { SiGithub, SiLinkedin } from "react-icons/si";
 
 export default function Hero() {
   return (
@@ -10,13 +11,13 @@ export default function Hero() {
       </p>
       <div className="flex justify-center gap-6 mb-6 text-gray-300">
         <a href="https://github.com/Erazor48" target="_blank" rel="noreferrer">
-          <GithubIcon size={24} />
+          <SiGithub size={24} />
         </a>
         <a href="https://www.linkedin.com/in/ethan-orain" target="_blank" rel="noreferrer">
-          <Linkedin size={24} />
+          <SiLinkedin size={24} />
         </a>
         <a href="/CV 3-4 months EV.pdf" target="_blank" rel="noreferrer">
-          <FileText size={24} />
+          <TbFileCv size={24} />
         </a>
       </div>
       <p className="max-w-xl mx-auto text-gray-400">
