@@ -4,15 +4,16 @@ import SkillsGrid from "@/components/SkillsGrid";
 export default function About() {
     return (
       <div className="min-h-screen bg-gray-900 text-white p-8">
-        <h1 className="text-3xl font-bold text-cyan-400 mb-6">À propos de moi</h1>
+        <h1 className="text-3xl font-bold text-cyan-400 mb-6">About me</h1>
         <p className="max-w-3xl text-gray-300 text-lg leading-relaxed">
-          Je suis étudiant en Intelligence Artificielle à <strong>Aivancity</strong>,
-          passionné par le traitement du langage naturel, les réseaux de neurones et la conception d'agents intelligents.
+        I'm an Artificial Intelligence student at <strong>Aivancity</strong>,
+        passionate about natural language processing, neural networks and intelligent agent design.
           <br /><br />
-          Mon objectif : créer des systèmes utiles, élégants et puissants, capables de comprendre, apprendre et interagir.
-          On peut se coder des outils, amis, automatiser son travail. L'intelligence dans tout ces formats se limite qu'as notre imagination.
+          My goal: to create useful, elegant and powerful systems that can understand, learn and interact. 
+          You can code tools for yourself, friends, automate your work. 
+          Intelligence in all these formats is limited only by our imagination.
           <br /><br />
-          <em>“Si ça pense, je veux le coder.”</em>
+          <em>“If it thinks, I want to code it.”</em>
         </p>
         <div className="mt-12">
           <SkillsGrid />

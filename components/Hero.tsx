@@ -15,7 +15,7 @@ export default function Hero() {
         <a href="https://www.linkedin.com/in/ethan-orain" target="_blank" rel="noreferrer">
           <Linkedin size={24} />
         </a>
-        <a href="/ethan-orain-cv.pdf" target="_blank" rel="noreferrer">
+        <a href="/CV 3-4 months EV.pdf" target="_blank" rel="noreferrer">
           <FileText size={24} />
         </a>
       </div>
