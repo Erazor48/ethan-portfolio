@@ -11,13 +11,13 @@ export default function Hero() {
       </p>
       <div className="flex justify-center gap-6 mb-6 text-gray-300">
         <a href="https://github.com/Erazor48" target="_blank" rel="noreferrer">
-          <SiGithub size={24} />
+          <SiGithub size={25} style={{marginTop: "2px"}}/>
         </a>
         <a href="https://www.linkedin.com/in/ethan-orain" target="_blank" rel="noreferrer">
-          <SiLinkedin size={24} />
+          <SiLinkedin size={24} style={{marginTop: "3px", marginLeft: "3px"}}/>
         </a>
         <a href="/CV 3-4 months EV.pdf" target="_blank" rel="noreferrer">
-          <TbFileCv size={24} />
+          <TbFileCv size={30} style={{}}/>
         </a>
       </div>
       <p className="max-w-xl mx-auto text-gray-400">
