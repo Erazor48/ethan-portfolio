@@ -1,4 +1,6 @@
 import '../styles/globals.css';
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export const metadata = {
   title: 'Next.js',
@@ -12,7 +14,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="bg-gray-900 text-white min-h-screen flex flex-col">
+        <Navbar />
+        {children}
+        <Footer />
+      </body>
     </html>
   )
 }
