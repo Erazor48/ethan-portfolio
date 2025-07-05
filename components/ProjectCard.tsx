@@ -19,7 +19,7 @@ interface ProjectProps {
             rel="noreferrer"
             className="text-sm text-cyan-400 underline hover:text-cyan-300"
           >
-            Voir sur GitHub
+            View on GitHub
           </a>
         )}
       </div>

@@ -1,6 +1,7 @@
 import '../styles/globals.css';
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { ExpandableChatDemo } from "@/components/ExpandableChatDemo";
 
 export const metadata = {
   title: 'Next.js',
@@ -14,9 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-gray-900 text-white min-h-screen flex flex-col">
+      <body className="dark bg-gray-900 text-white min-h-screen flex flex-col">
         <Navbar />
         {children}
+        <ExpandableChatDemo />
         <Footer />
       </body>
     </html>
