@@ -7,15 +7,15 @@ import {
   ChatBubble,
   ChatBubbleAvatar,
   ChatBubbleMessage,
-} from "@/components/ui/chat-bubble"
-import { ChatInput } from "@/components/ui/chat-input"
+} from "@/components/ui/chat/chat-bubble"
+import { ChatInput } from "@/components/ui/chat/chat-input"
 import {
   ExpandableChat,
   ExpandableChatHeader,
   ExpandableChatBody,
   ExpandableChatFooter,
-} from "@/components/ui/expandable-chat"
-import { ChatMessageList } from "@/components/ui/chat-message-list"
+} from "@/components/ui/chat/expandable-chat"
+import { ChatMessageList } from "@/components/ui/chat/chat-message-list"
 import { useChat } from "@/components/hooks/useChat"
 
 export function ExpandableChatDemo() {
@@ -55,13 +55,13 @@ export function ExpandableChatDemo() {
         <ExpandableChatHeader className="flex-col text-center justify-center">
           <h1 className="text-xl font-semibold">Chat with Ethan ✨</h1>
           <p className="text-sm text-muted-foreground">
-            Ask me anything about Ethan's skills, projects, and experience
+            Ask me questions about my skills, projects, and experience
           </p>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-            <p className="text-sm text-blue-800">
-              ⚠️ This chatbot is currently in early development and may not provide accurate information yet.
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+            <p className="text-sm text-green-800">
+              🤖 AI Assistant powered by LangChain
               <br/>
-              It not work very well but it will be fix as soon as possible.
+              Data synchronized with GitHub in real-time
             </p>
           </div>
           <Button
@@ -135,8 +135,8 @@ export function ExpandableChatDemo() {
             <ChatInput
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about Ethan's skills, projects, or experience..."
-              className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
+              placeholder="Ask a question about my skills, projects, or experience..."
+              className="min-h-12 resize-none rounded-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
               disabled={isLoading}
             />
             <div className="flex items-center p-3 pt-0 justify-between">

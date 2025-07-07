@@ -4,7 +4,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { MessageLoading } from "@/components/ui/message-loading";
+import { MessageLoading } from "@/components/ui/chat/message-loading";
 
 interface ChatBubbleProps {
   variant?: "sent" | "received"
