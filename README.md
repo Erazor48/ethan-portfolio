@@ -1,82 +1,105 @@
-# Ethan's Portfolio with AI Chatbot
+# Ethan Orain Portfolio - AI Chatbot
 
-A modern portfolio website with an intelligent chatbot that knows about Ethan's skills, projects, and experience.
+Personal portfolio with an AI chatbot powered by LangChain and automatic GitHub synchronization.
 
-## Features
+## 🚀 Features
 
-- **AI Chatbot** - Intelligent assistant that knows about Ethan's profile
-- **Modern UI** - Built with Next.js, TypeScript, and Tailwind CSS
-- **Responsive Design** - Works on all devices
-- **Secure** - No API keys exposed, uses Hugging Face free tier
-- **Real-time** - Instant responses with loading states
+- **Intelligent AI Chatbot** : Conversational assistant powered by LangChain
+- **GitHub Synchronization** : Automatic retrieval of projects and skills from GitHub
+- **Structured Database** : Centralized and organized personal data
+- **Modern Interface** : Responsive design with Tailwind CSS
+- **Optimized Performance** : Cache system and optimized queries
+- **Project Automation** : Automatic project management from GitHub
 
-## Setup
+## 🛠️ Architecture
 
-1. **Install dependencies**
-   ```bash
-   npm install
-   ```
+### Data Structure
+```
+lib/
+├── data/
+│   └── personal-data.ts          # Structured personal data
+├── services/
+│   ├── chatbot-service.ts        # LangChain service for chatbot
+│   ├── github-sync.ts           # GitHub synchronization
+│   ├── project-automation.ts    # Automated project management
+│   └── data-service.ts          # Centralized data access service
+└── components/
+    └── hooks/
+        └── useChat.ts           # Custom chat hook
+```
 
-2. **Environment variables** (optional)
-   Create a `.env.local` file:
-   ```env
-   # Hugging Face API Key (optional - for enhanced AI responses)
-   # Get a free API key from https://huggingface.co/settings/tokens
-   HUGGINGFACE_API_KEY=your_api_key_here
-   
-   # Rate limiting (optional)
-   RATE_LIMIT_MAX_REQUESTS=10
-   RATE_LIMIT_WINDOW_MS=60000
-   ```
+### Main Services
 
-3. **Run the development server**
-   ```bash
-   npm run dev
-   ```
+1. **ChatbotService** : Manages AI interactions with LangChain
+2. **GitHubSyncService** : Synchronizes data with GitHub
+3. **ProjectAutomationService** : Automated project management
+4. **DataService** : Centralized data access point
 
-4. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+## 📦 Installation
 
-## Chatbot Features
+```bash
+npm install
+```
 
-The chatbot can answer questions about:
-- Ethan's skills and technologies
-- Projects and work experience
-- Contact information and social links
-- Background and education
-- Location and availability
+## 🔧 Configuration
 
-## Security
+1. Create a `.env.local` file:
+```env
+OPENAI_API_KEY=your_openai_api_key_here
+GITHUB_TOKEN=your_github_token_here
+```
 
-- No API keys exposed in client-side code
-- Rate limiting to prevent abuse
-- Input validation and sanitization
-- Error handling for graceful failures
+2. Update your personal data in `lib/data/personal-data.ts`
 
-## Technologies Used
+## 🚀 Démarrage
 
-- **Frontend**: Next.js, React, TypeScript
-- **Styling**: Tailwind CSS, shadcn/ui
-- **AI**: Hugging Face Inference API
-- **Icons**: Lucide React
-- **State Management**: React hooks
+```bash
+npm run dev
+```
 
-## Customization
+## 📊 Chatbot Features
 
-To update Ethan's information, edit `lib/ai/knowledge-base.ts` with the latest:
-- Skills and technologies
-- Projects and experience
-- Contact information
-- Education and background
+- **Skills Questions** : "What are your React skills?"
+- **Project Search** : "Show me your TypeScript projects"
+- **Personal Information** : "Tell me about your experience"
+- **Intelligent Suggestions** : The chatbot can suggest projects or skills
 
-## Deployment
+## 🔄 GitHub Synchronization
 
-The chatbot works without any API keys (uses fallback responses), but for enhanced AI responses, you can:
+The system automatically retrieves:
+- GitHub projects with descriptions and technologies
+- Programming languages used
+- Project statistics (stars, forks)
+- Real-time updates with intelligent caching
 
-1. Get a free Hugging Face API key
-2. Add it to your environment variables
-3. Deploy to Vercel, Netlify, or any Next.js hosting
+## 🎯 Advantages
 
-## License
+- **Minimal Code** : Optimized architecture with minimal code
+- **Scalable** : Easy to add new data sources
+- **Performance** : Cache system and optimized queries
+- **Maintainable** : Clear structure and complete documentation
 
-MIT License - feel free to use this code for your own portfolio! 
+## 🔧 Customization
+
+### Adding New Data
+1. Modify `lib/data/personal-data.ts`
+2. The chatbot will automatically have access to new information
+
+### Adding New Sources
+1. Create a new service in `lib/services/`
+2. Integrate it into `DataService`
+
+## 📝 API Endpoints
+
+- `POST /api/chat` : Send a message to the chatbot
+- `GET /api/chat` : Get quick facts
+- `GET /api/projects` : Get automated projects
+- `POST /api/projects` : Get project statistics
+
+## 🤝 Contributing
+
+1. Fork the project
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request 
