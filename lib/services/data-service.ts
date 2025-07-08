@@ -1,5 +1,6 @@
 import { personalData, PersonalData } from '../data/personal-data';
 import { githubSyncService } from './github-sync';
+import { linkedinSyncService } from './linkedin-sync';
 
 export class DataService {
   private static instance: DataService;
@@ -41,13 +42,25 @@ export class DataService {
   }
 
   async getSkills() {
-    const data = await this.getPersonalData();
-    return data.skills;
+    try {
+      const linkedinSkills = await linkedinSyncService.getSkillsByCategory();
+      return linkedinSkills;
+    } catch (error) {
+      console.error('Error loading LinkedIn skills, falling back to local data:', error);
+      const data = await this.getPersonalData();
+      return data.skills;
+    }
   }
 
   async getExperience() {
-    const data = await this.getPersonalData();
-    return data.experience;
+    try {
+      const linkedinExperience = await linkedinSyncService.getExperience();
+      return linkedinExperience;
+    } catch (error) {
+      console.error('Error loading LinkedIn experience, falling back to local data:', error);
+      const data = await this.getPersonalData();
+      return data.experience;
+    }
   }
 
   async getPersonalInfo() {
@@ -56,8 +69,14 @@ export class DataService {
   }
 
   async getEducation() {
-    const data = await this.getPersonalData();
-    return data.education;
+    try {
+      const linkedinEducation = await linkedinSyncService.getEducation();
+      return linkedinEducation;
+    } catch (error) {
+      console.error('Error loading LinkedIn education, falling back to local data:', error);
+      const data = await this.getPersonalData();
+      return data.education;
+    }
   }
 
   async getSocialLinks() {
