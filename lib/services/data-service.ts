@@ -43,10 +43,23 @@ export class DataService {
 
   async getSkills() {
     try {
+      // Try GitHub first (extracted from projects)
+      const githubSkills = await githubSyncService.getSkillsByCategory();
+      if (Object.values(githubSkills).some(skills => skills.length > 0)) {
+        return githubSkills;
+      }
+      
+      // Fallback to LinkedIn if GitHub has no skills
       const linkedinSkills = await linkedinSyncService.getSkillsByCategory();
-      return linkedinSkills;
+      if (Object.values(linkedinSkills).some(skills => skills.length > 0)) {
+        return linkedinSkills;
+      }
+      
+      // Final fallback to local data
+      const data = await this.getPersonalData();
+      return data.skills;
     } catch (error) {
-      console.error('Error loading LinkedIn skills, falling back to local data:', error);
+      console.error('Error loading skills, falling back to local data:', error);
       const data = await this.getPersonalData();
       return data.skills;
     }

@@ -13,6 +13,14 @@ export interface GitHubProject {
   updated_at: string;
 }
 
+export interface GitHubSkill {
+  name: string;
+  category: 'programming' | 'framework' | 'tool' | 'database' | 'platform';
+  frequency: number;
+  projects: string[];
+  stars: number;
+}
+
 export class GitHubSyncService {
   private static instance: GitHubSyncService;
   private cache: Map<string, any> = new Map();
@@ -34,7 +42,7 @@ export class GitHubSyncService {
     }
 
     try {
-      const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=10`);
+      const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=20`);
       if (!response.ok) throw new Error('Failed to fetch GitHub projects');
       
       const projects: GitHubProject[] = await response.json();
@@ -50,6 +58,92 @@ export class GitHubSyncService {
       console.error('Error fetching GitHub projects:', error);
       return [];
     }
+  }
+
+  async extractSkillsFromGitHub(): Promise<GitHubSkill[]> {
+    const username = personalData.social.github.split('/').pop();
+    if (!username) return [];
+
+    const projects = await this.fetchGitHubProjects(username);
+    const skillMap = new Map<string, GitHubSkill>();
+
+    // Define skill categories
+    const skillCategories = {
+      programming: ['python', 'javascript', 'typescript', 'java', 'c', 'cpp', 'c++', 'go', 'rust', 'php', 'ruby', 'swift', 'kotlin'],
+      framework: ['react', 'vue', 'angular', 'next.js', 'nuxt', 'express', 'django', 'flask', 'fastapi', 'spring', 'laravel', 'rails', 'pytorch', 'tensorflow', 'langchain', 'transformers'],
+      tool: ['git', 'docker', 'kubernetes', 'jenkins', 'github', 'gitlab', 'bitbucket', 'vscode', 'cursor', 'postman', 'figma'],
+      database: ['mysql', 'postgresql', 'mongodb', 'redis', 'sqlite', 'elasticsearch', 'cassandra'],
+      platform: ['aws', 'azure', 'gcp', 'vercel', 'netlify', 'heroku', 'digitalocean']
+    };
+
+    projects.forEach(project => {
+      // Extract from language
+      if (project.language) {
+        const language = project.language.toLowerCase();
+        this.addSkillToMap(skillMap, language, 'programming', project);
+      }
+
+      // Extract from topics
+      project.topics.forEach(topic => {
+        const topicLower = topic.toLowerCase();
+        
+        // Check each category
+        Object.entries(skillCategories).forEach(([category, skills]) => {
+          if (skills.some(skill => topicLower.includes(skill))) {
+            this.addSkillToMap(skillMap, topic, category as any, project);
+          }
+        });
+      });
+
+      // Extract from description
+      if (project.description) {
+        const descLower = project.description.toLowerCase();
+        Object.entries(skillCategories).forEach(([category, skills]) => {
+          skills.forEach(skill => {
+            if (descLower.includes(skill)) {
+              this.addSkillToMap(skillMap, skill, category as any, project);
+            }
+          });
+        });
+      }
+    });
+
+    return Array.from(skillMap.values()).sort((a, b) => b.frequency - a.frequency);
+  }
+
+  private addSkillToMap(skillMap: Map<string, GitHubSkill>, skillName: string, category: string, project: GitHubProject) {
+    const normalizedName = skillName.toLowerCase();
+    const existing = skillMap.get(normalizedName);
+    
+    if (existing) {
+      existing.frequency++;
+      existing.stars += project.stargazers_count;
+      if (!existing.projects.includes(project.name)) {
+        existing.projects.push(project.name);
+      }
+    } else {
+      skillMap.set(normalizedName, {
+        name: skillName,
+        category: category as any,
+        frequency: 1,
+        projects: [project.name],
+        stars: project.stargazers_count
+      });
+    }
+  }
+
+  async getSkillsByCategory(): Promise<Record<string, GitHubSkill[]>> {
+    const skills = await this.extractSkillsFromGitHub();
+    
+    const skillsByCategory = {
+      programming: skills.filter(s => s.category === 'programming'),
+      framework: skills.filter(s => s.category === 'framework'),
+      tool: skills.filter(s => s.category === 'tool'),
+      database: skills.filter(s => s.category === 'database'),
+      platform: skills.filter(s => s.category === 'platform')
+    };
+
+    return skillsByCategory;
   }
 
   async syncWithPersonalData(): Promise<PersonalData> {
@@ -77,7 +171,7 @@ export class GitHubSyncService {
       return project;
     });
 
-    // Add new GitHub projects
+    // Ajouter les nouveaux projets GitHub
     const existingProjectNames = personalData.projects.map(p => p.name.toLowerCase());
     const newProjects = githubProjects
       .filter(gp => !existingProjectNames.includes(gp.name.toLowerCase()))
