@@ -44,72 +44,33 @@ export class LinkedInSyncService {
   }
 
   async fetchLinkedInProfile(): Promise<LinkedInProfile | null> {
-    // Note: LinkedIn API requires authentication
-    // For now, we'll use mock data based on your profile
+    // Note: LinkedIn API requires authentication and is complex to set up
+    // For now, we'll return null to trigger fallback to local data
     // In production, you'd need to use LinkedIn API with proper authentication
     
-    const mockProfile: LinkedInProfile = {
-      name: "Ethan Orain",
-      headline: "AI Engineer · NLP · Neural Networks · LLMs Enthusiast",
-      location: "France",
-      summary: "I'm an Artificial Intelligence student at Aivancity, passionate about natural language processing, neural networks and intelligent agent design. My goal: to create useful, elegant and powerful systems that can understand, learn and interact.",
-      experience: [
-        {
-          title: "AI Student",
-          company: "Aivancity",
-          duration: "2023 - Present",
-          description: "Studying Artificial Intelligence with focus on NLP, neural networks and intelligent agent design"
-        },
-        {
-          title: "AI Developer",
-          company: "Freelance",
-          duration: "2022 - 2023",
-          description: "Working on various AI projects including NLP and computer vision"
-        }
-      ],
-      education: [
-        {
-          degree: "Master in Artificial Intelligence",
-          institution: "Aivancity",
-          duration: "2023 - Present",
-          description: "Specialization in natural language processing, neural networks and intelligent agent design"
-        }
-      ],
-      skills: [
-        // Technical Skills
-        { name: "Python", endorsements: 15, category: "technical" },
-        { name: "PyTorch", endorsements: 12, category: "technical" },
-        { name: "LangChain", endorsements: 10, category: "technical" },
-        { name: "Transformers", endorsements: 8, category: "technical" },
-        { name: "React", endorsements: 6, category: "technical" },
-        { name: "Next.js", endorsements: 5, category: "technical" },
-        { name: "TypeScript", endorsements: 4, category: "technical" },
-        { name: "C", endorsements: 3, category: "technical" },
-        
-        // Tools
-        { name: "Git", endorsements: 12, category: "tool" },
-        { name: "VS Code", endorsements: 10, category: "tool" },
-        { name: "Cursor", endorsements: 8, category: "tool" },
-        { name: "Docker", endorsements: 5, category: "tool" },
-        
-        // Soft Skills
-        { name: "Problem Solving", endorsements: 15, category: "soft" },
-        { name: "Communication", endorsements: 12, category: "soft" },
-        { name: "Team Work", endorsements: 10, category: "soft" },
-        { name: "Adaptability", endorsements: 8, category: "soft" },
-        
-        // Languages
-        { name: "French", endorsements: 20, category: "language" },
-        { name: "English", endorsements: 15, category: "language" }
-      ]
-    };
-
-    return mockProfile;
+    try {
+      // Attempt to fetch from LinkedIn API (would need proper setup)
+      // const response = await fetch('https://api.linkedin.com/v2/me', {
+      //   headers: {
+      //     'Authorization': `Bearer ${process.env.LINKEDIN_ACCESS_TOKEN}`,
+      //     'Content-Type': 'application/json'
+      //   }
+      // });
+      
+      // For now, return null to use fallback data
+      return null;
+    } catch (error) {
+      console.error('LinkedIn API not configured, using fallback data');
+      return null;
+    }
   }
 
   async getSkillsByCategory(): Promise<Record<string, LinkedInSkill[]>> {
     const profile = await this.fetchLinkedInProfile();
-    if (!profile) return {};
+    if (!profile) {
+      // Return empty to trigger GitHub fallback
+      return {};
+    }
 
     const skillsByCategory = {
       technical: profile.skills.filter(s => s.category === 'technical'),
