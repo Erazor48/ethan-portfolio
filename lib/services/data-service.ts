@@ -68,12 +68,17 @@ export class DataService {
   async getExperience() {
     try {
       const linkedinExperience = await linkedinSyncService.getExperience();
-      return linkedinExperience;
+      // LinkedIn returns empty array when no data, so we check length
+      if (linkedinExperience && linkedinExperience.length > 0) {
+        return linkedinExperience;
+      }
     } catch (error) {
       console.error('Error loading LinkedIn experience, falling back to local data:', error);
-      const data = await this.getPersonalData();
-      return data.experience;
     }
+    
+    // Fallback to local data
+    const data = await this.getPersonalData();
+    return data.experience;
   }
 
   async getPersonalInfo() {
@@ -84,12 +89,17 @@ export class DataService {
   async getEducation() {
     try {
       const linkedinEducation = await linkedinSyncService.getEducation();
-      return linkedinEducation;
+      // LinkedIn returns empty array when no data, so we check length
+      if (linkedinEducation && linkedinEducation.length > 0) {
+        return linkedinEducation;
+      }
     } catch (error) {
       console.error('Error loading LinkedIn education, falling back to local data:', error);
-      const data = await this.getPersonalData();
-      return data.education;
     }
+    
+    // Fallback to local data
+    const data = await this.getPersonalData();
+    return data.education;
   }
 
   async getSocialLinks() {

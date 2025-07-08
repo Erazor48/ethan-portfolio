@@ -42,8 +42,31 @@ export class GitHubSyncService {
     }
 
     try {
-      const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=20`);
-      if (!response.ok) throw new Error('Failed to fetch GitHub projects');
+      const headers: HeadersInit = {
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'Ethan-Portfolio-App'
+      };
+
+      // Ajouter le token d'authentification si disponible
+      const githubToken = process.env.GITHUB_TOKEN;
+      if (githubToken) {
+        headers['Authorization'] = `token ${githubToken}`;
+      }
+
+      const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=20`, {
+        headers
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          console.warn('GitHub token invalide ou manquant. Utilisation des données publiques uniquement.');
+        } else if (response.status === 403) {
+          console.warn('Limite de taux GitHub atteinte. Utilisation des données publiques uniquement.');
+        } else {
+          throw new Error(`GitHub API error: ${response.status}`);
+        }
+        return [];
+      }
       
       const projects: GitHubProject[] = await response.json();
       
