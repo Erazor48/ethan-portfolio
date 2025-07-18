@@ -65,9 +65,9 @@ export interface PersonalData {
     liveUrl?: string;
     image?: string;
     featured: boolean;
-    start: { month: string; year: string } | null;
-    end: { month: string; year: string } | null;
-    ongoing: boolean;
+    start?: { month: string; year: string } | null;
+    end?: { month: string; year: string } | null;
+    ongoing?: boolean;
   }>;
   
   // Liens sociaux
