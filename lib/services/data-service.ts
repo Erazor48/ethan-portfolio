@@ -1,6 +1,5 @@
 import { personalData, PersonalData } from '../data/personal-data';
 import { githubSyncService } from './github-sync';
-import { linkedinSyncService } from './linkedin-sync';
 
 export class DataService {
   private static instance: DataService;
@@ -21,18 +20,15 @@ export class DataService {
 
   async getPersonalData(): Promise<PersonalData> {
     const cacheKey = 'personal_data';
-    
     if (this.isCacheValid(cacheKey)) {
       return this.cache.get(cacheKey)!.data;
     }
-
+    // Synchronisation GitHub uniquement pour les projets
     const syncedData = await githubSyncService.syncWithPersonalData();
-    
     this.cache.set(cacheKey, {
       data: syncedData,
       timestamp: Date.now()
     });
-
     return syncedData;
   }
 
@@ -42,41 +38,11 @@ export class DataService {
   }
 
   async getSkills() {
-    try {
-      // Try GitHub first (extracted from projects)
-      const githubSkills = await githubSyncService.getSkillsByCategory();
-      if (Object.values(githubSkills).some(skills => skills.length > 0)) {
-        return githubSkills;
-      }
-      
-      // Fallback to LinkedIn if GitHub has no skills
-      const linkedinSkills = await linkedinSyncService.getSkillsByCategory();
-      if (Object.values(linkedinSkills).some(skills => skills.length > 0)) {
-        return linkedinSkills;
-      }
-      
-      // Final fallback to local data
-      const data = await this.getPersonalData();
-      return data.skills;
-    } catch (error) {
-      console.error('Error loading skills, falling back to local data:', error);
-      const data = await this.getPersonalData();
-      return data.skills;
-    }
+    const data = await this.getPersonalData();
+    return data.skills;
   }
 
   async getExperience() {
-    try {
-      const linkedinExperience = await linkedinSyncService.getExperience();
-      // LinkedIn returns empty array when no data, so we check length
-      if (linkedinExperience && linkedinExperience.length > 0) {
-        return linkedinExperience;
-      }
-    } catch (error) {
-      console.error('Error loading LinkedIn experience, falling back to local data:', error);
-    }
-    
-    // Fallback to local data
     const data = await this.getPersonalData();
     return data.experience;
   }
@@ -87,17 +53,6 @@ export class DataService {
   }
 
   async getEducation() {
-    try {
-      const linkedinEducation = await linkedinSyncService.getEducation();
-      // LinkedIn returns empty array when no data, so we check length
-      if (linkedinEducation && linkedinEducation.length > 0) {
-        return linkedinEducation;
-      }
-    } catch (error) {
-      console.error('Error loading LinkedIn education, falling back to local data:', error);
-    }
-    
-    // Fallback to local data
     const data = await this.getPersonalData();
     return data.education;
   }
@@ -110,7 +65,6 @@ export class DataService {
   async searchProjects(query: string) {
     const projects = await this.getProjects();
     const searchTerm = query.toLowerCase();
-    
     return projects.filter(project =>
       project.name.toLowerCase().includes(searchTerm) ||
       project.description.toLowerCase().includes(searchTerm) ||
