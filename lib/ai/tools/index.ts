@@ -1,6 +1,6 @@
 import { GitHubTool } from './github-tool';
-import { LinkedInTool } from './linkedin-tool';
-import { CVTool } from './cv-tool';
+// import { LinkedInTool } from './linkedin-tool';
+// import { CVTool } from './cv-tool';
 import { ProjectTool } from './project-tool';
 import { SkillTool } from './skill-tool';
 
@@ -20,8 +20,8 @@ export class ToolManager {
 
   private registerTools() {
     this.tools.set('get_github_profile', new GitHubTool());
-    this.tools.set('get_linkedin_profile', new LinkedInTool());
-    this.tools.set('get_cv_info', new CVTool());
+    // this.tools.set('get_linkedin_profile', new LinkedInTool());
+    // this.tools.set('get_cv_info', new CVTool());
     this.tools.set('get_projects', new ProjectTool());
     this.tools.set('get_skills', new SkillTool());
   }
