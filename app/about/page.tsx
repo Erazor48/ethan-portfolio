@@ -131,6 +131,11 @@ export default function About() {
                 <span key={tech} className="bg-cyan-700 text-white px-3 py-1 rounded-full text-sm">{tech}</span>
               ))}
             </div>
+            {featuredProject.start && featuredProject.end && (
+              <div className="text-gray-400 text-sm mb-2">
+                {`${featuredProject.start.month}/${featuredProject.start.year} – ${featuredProject.ongoing ? 'Present' : (featuredProject.end ? featuredProject.end.month + '/' + featuredProject.end.year : 'N/A')}`}
+              </div>
+            )}
             {featuredProject.githubUrl && (
               <a href={featuredProject.githubUrl} target="_blank" rel="noreferrer" className="text-cyan-400 underline">GitHub</a>
             )}
