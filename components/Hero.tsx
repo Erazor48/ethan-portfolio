@@ -5,6 +5,7 @@ import { TbFileCv } from "react-icons/tb";
 import { SiGithub, SiLinkedin } from "react-icons/si";
 import { dataService } from "@/lib/services/data-service";
 import { useEffect, useState } from "react";
+import NeuralNetworkBackground from "@/components/NeuralNetworkBackground";
 
 export default function Hero() {
   const [personalInfo, setPersonalInfo] = useState<any>(null);
@@ -48,25 +49,61 @@ export default function Hero() {
   }
 
   return (
-    <section className="text-center py-20 px-4">
-      <h1 className="text-4xl font-bold mb-4">{personalInfo?.name || "Ethan Orain"}</h1>
-      <p className="text-cyan-400 text-lg mb-6">
-        {personalInfo?.bio || "AI Engineer · NLP · Neural Networks · LLMs Enthusiast"}
-      </p>
-      <div className="flex justify-center gap-6 mb-6 text-gray-300">
-        <a href={socialLinks?.github || "https://github.com/Erazor48"} target="_blank" rel="noreferrer">
-          <SiGithub size={25} style={{marginTop: "2px"}}/>
-        </a>
-        <a href={socialLinks?.linkedin || "https://www.linkedin.com/in/ethan-orain"} target="_blank" rel="noreferrer">
-          <SiLinkedin size={24} style={{marginTop: "3px", marginLeft: "3px"}}/>
-        </a>
-        <a href="/CV 3-4 months EV.pdf" target="_blank" rel="noreferrer">
-          <TbFileCv size={30} style={{}}/>
-        </a>
+    <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#0a223a] to-[#061c33] pb-16">
+      {/* Poster */}
+      <div className="w-full h-[320px] relative">
+        <img
+          src="/Poster_AI_Blue_Light_Weight.png"
+          alt="Blue AI Poster"
+          className="absolute inset-0 w-full h-full object-cover object-center z-0"
+          style={{ pointerEvents: 'none' }}
+        />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0a223a] to-transparent" />
       </div>
-      <p className="max-w-xl mx-auto text-gray-400">
-        {personalInfo?.bio || "I'm a student at Aivancity passionate about building smart systems with code. I work on NLP, agents, neural nets and always looking to solve cool problems."}
-      </p>
+      {/* Neural network background effect */}
+      <NeuralNetworkBackground className="absolute inset-0 z-0 pointer-events-none" />
+      {/* Main content with animated appearance */}
+      <div className="relative flex flex-col items-center -mt-20 z-10">
+        <div className="relative animate-fadeInUp" style={{ animationDelay: "0.1s" }}>
+          <span className="absolute inset-0 rounded-full animate-pulse-glow bg-cyan-400/30 blur-2xl" />
+          <img
+            src="/Profile_Pickture_Men_blue.png"
+            alt="Profile picture"
+            className="w-36 h-36 rounded-full border-4 border-cyan-400 shadow-2xl bg-white object-cover relative z-10"
+          />
+        </div>
+        <h1 className="text-4xl font-bold text-white mt-6 mb-2 drop-shadow-lg animate-fadeInUp" style={{ animationDelay: "0.3s" }}>
+          Building intelligent systems for tomorrow
+        </h1>
+        <p className="text-cyan-200 text-lg font-medium mb-2 drop-shadow animate-fadeInUp" style={{ animationDelay: "0.5s" }}>
+          AI Engineer · NLP · Neural Networks · LLMs Enthusiast
+        </p>
+        <p className="text-gray-200 text-center max-w-xl mb-3 drop-shadow animate-fadeInUp" style={{ animationDelay: "0.7s" }}>
+          Passionate about creating robust, scalable, and innovative AI solutions. Always exploring new technologies and pushing boundaries in machine learning and software engineering.
+        </p>
+        <div className="flex justify-center gap-6 mb-6 text-gray-300 animate-fadeInUp" style={{ animationDelay: "0.9s" }}>
+          <a href={socialLinks?.github || "https://github.com/Erazor48"} target="_blank" rel="noreferrer">
+            <SiGithub size={25} style={{marginTop: "2px"}}/>
+          </a>
+          <a href={socialLinks?.linkedin || "https://www.linkedin.com/in/ethan-orain"} target="_blank" rel="noreferrer">
+            <SiLinkedin size={24} style={{marginTop: "3px", marginLeft: "3px"}}/>
+          </a>
+          <a href="/CV 3-4 months EV.pdf" target="_blank" rel="noreferrer">
+            <TbFileCv size={30} style={{}}/>
+          </a>
+        </div>
+        <div className="mt-8 animate-fadeInUp" style={{ animationDelay: "1.1s" }}>
+          <a href="projects" className="px-6 py-3 bg-cyan-500 text-white rounded-full font-semibold shadow-lg hover:bg-cyan-600 transition">
+            View my projects
+          </a>
+        </div>
+      </div>
+      {/* Optional: SVG wave for section transition */}
+      <div className="w-full overflow-hidden -mb-1">
+        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#061c33" d="M0,32 C480,80 960,0 1440,48 L1440,80 L0,80 Z"/>
+        </svg>
+      </div>
     </section>
   );
 }

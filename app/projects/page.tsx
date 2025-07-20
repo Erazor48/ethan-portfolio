@@ -5,6 +5,7 @@ import ProjectCard from "@/components/ProjectCard";
 import { projectAutomationService } from "@/lib/services/project-automation";
 import { useEffect, useState } from "react";
 import { dataService } from "@/lib/services/data-service";
+import AnimatedSection from "@/components/AnimatedSection";
 
 export default function Projects() {
   const [projects, setProjects] = useState<any[]>([]);
@@ -98,18 +99,22 @@ export default function Projects() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
-      <h1 className="text-3xl font-bold text-cyan-400 mb-6">My Projects</h1>
-      <div className="grid gap-6 md:grid-cols-2">
-        {projects.map((project) => (
-          <ProjectCard
-            key={project.id}
-            title={project.name}
-            tech={project.technologies?.join(" · ") || ""}
-            description={project.description}
-            github={project.githubUrl}
-          />
-        ))}
-      </div>
+      <AnimatedSection delay={0.1}>
+        <h1 className="text-3xl font-bold text-cyan-400 mb-6">My Projects</h1>
+      </AnimatedSection>
+      <AnimatedSection delay={0.2}>
+        <div className="grid gap-6 md:grid-cols-2">
+          {projects.map((project) => (
+            <ProjectCard
+              key={project.id}
+              title={project.name}
+              tech={project.technologies?.join(" · ") || ""}
+              description={project.description}
+              github={project.githubUrl}
+            />
+          ))}
+        </div>
+      </AnimatedSection>
     </div>
   );
 }
