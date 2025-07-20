@@ -41,6 +41,12 @@ const skillCategories: Record<string, SkillCategory> = {
     color: "text-cyan-400",
     bgColor: "bg-cyan-900/20",
     borderColor: "border-cyan-500/30"
+  },
+  other: {
+    name: "Other / Uncategorized",
+    color: "text-gray-300",
+    bgColor: "bg-gray-700/20",
+    borderColor: "border-gray-500/30"
   }
 };
 
