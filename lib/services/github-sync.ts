@@ -21,6 +21,76 @@ export interface GitHubSkill {
   stars: number;
 }
 
+// Nouveau mapping éditable et patterns pour la catégorisation
+export const skillCategoryMapping: Record<string, string> = {
+  python: 'programming',
+  javascript: 'programming',
+  typescript: 'programming',
+  java: 'programming',
+  c: 'programming',
+  cpp: 'programming',
+  'c++': 'programming',
+  go: 'programming',
+  rust: 'programming',
+  php: 'programming',
+  ruby: 'programming',
+  swift: 'programming',
+  kotlin: 'programming',
+  react: 'framework',
+  vue: 'framework',
+  angular: 'framework',
+  'next.js': 'framework',
+  nextjs: 'framework',
+  nuxt: 'framework',
+  express: 'framework',
+  django: 'framework',
+  flask: 'framework',
+  fastapi: 'framework',
+  spring: 'framework',
+  laravel: 'framework',
+  rails: 'framework',
+  pytorch: 'framework',
+  tensorflow: 'framework',
+  langchain: 'framework',
+  transformers: 'framework',
+  git: 'tool',
+  docker: 'tool',
+  kubernetes: 'tool',
+  jenkins: 'tool',
+  github: 'tool',
+  gitlab: 'tool',
+  bitbucket: 'tool',
+  vscode: 'tool',
+  cursor: 'tool',
+  postman: 'tool',
+  figma: 'tool',
+  mysql: 'database',
+  postgresql: 'database',
+  mongodb: 'database',
+  redis: 'database',
+  sqlite: 'database',
+  elasticsearch: 'database',
+  cassandra: 'database',
+  aws: 'platform',
+  azure: 'platform',
+  gcp: 'platform',
+  vercel: 'platform',
+  netlify: 'platform',
+  heroku: 'platform',
+  digitalocean: 'platform',
+};
+
+export function categorizeSkill(skill: string): string {
+  const s = skill.toLowerCase();
+  if (skillCategoryMapping[s]) return skillCategoryMapping[s];
+  if (s.includes('js') || s.includes('react') || s.includes('vue') || s.includes('angular')) return 'framework';
+  if (s.includes('python') || s.includes('typescript') || s.includes('java')) return 'programming';
+  if (s.includes('docker') || s.includes('github') || s.includes('vercel')) return 'tool';
+  if (s.includes('sql') || s.includes('mongo') || s.includes('db')) return 'database';
+  if (s.includes('aws') || s.includes('azure') || s.includes('gcp')) return 'platform';
+  return 'other';
+}
+
 export class GitHubSyncService {
   private static instance: GitHubSyncService;
   private cache: Map<string, any> = new Map();
@@ -90,43 +160,25 @@ export class GitHubSyncService {
     const projects = await this.fetchGitHubProjects(username);
     const skillMap = new Map<string, GitHubSkill>();
 
-    // Define skill categories
-    const skillCategories = {
-      programming: ['python', 'javascript', 'typescript', 'java', 'c', 'cpp', 'c++', 'go', 'rust', 'php', 'ruby', 'swift', 'kotlin'],
-      framework: ['react', 'vue', 'angular', 'next.js', 'nuxt', 'express', 'django', 'flask', 'fastapi', 'spring', 'laravel', 'rails', 'pytorch', 'tensorflow', 'langchain', 'transformers'],
-      tool: ['git', 'docker', 'kubernetes', 'jenkins', 'github', 'gitlab', 'bitbucket', 'vscode', 'cursor', 'postman', 'figma'],
-      database: ['mysql', 'postgresql', 'mongodb', 'redis', 'sqlite', 'elasticsearch', 'cassandra'],
-      platform: ['aws', 'azure', 'gcp', 'vercel', 'netlify', 'heroku', 'digitalocean']
-    };
-
     projects.forEach(project => {
-      // Extract from language
+      // Langage principal
       if (project.language) {
-        const language = project.language.toLowerCase();
-        this.addSkillToMap(skillMap, language, 'programming', project);
+        const cat = categorizeSkill(project.language);
+        this.addSkillToMap(skillMap, project.language, cat, project);
       }
-
-      // Extract from topics
+      // Topics
       project.topics.forEach(topic => {
-        const topicLower = topic.toLowerCase();
-        
-        // Check each category
-        Object.entries(skillCategories).forEach(([category, skills]) => {
-          if (skills.some(skill => topicLower.includes(skill))) {
-            this.addSkillToMap(skillMap, topic, category as any, project);
-          }
-        });
+        const cat = categorizeSkill(topic);
+        this.addSkillToMap(skillMap, topic, cat, project);
       });
-
-      // Extract from description
+      // Description
       if (project.description) {
         const descLower = project.description.toLowerCase();
-        Object.entries(skillCategories).forEach(([category, skills]) => {
-          skills.forEach(skill => {
-            if (descLower.includes(skill)) {
-              this.addSkillToMap(skillMap, skill, category as any, project);
-            }
-          });
+        Object.keys(skillCategoryMapping).forEach(skill => {
+          if (descLower.includes(skill)) {
+            const cat = skillCategoryMapping[skill] || 'other';
+            this.addSkillToMap(skillMap, skill, cat, project);
+          }
         });
       }
     });

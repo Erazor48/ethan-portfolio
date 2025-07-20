@@ -1,6 +1,4 @@
 import { GitHubTool } from './github-tool';
-// import { LinkedInTool } from './linkedin-tool';
-// import { CVTool } from './cv-tool';
 import { ProjectTool } from './project-tool';
 import { SkillTool } from './skill-tool';
 

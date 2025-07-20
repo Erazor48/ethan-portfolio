@@ -37,14 +37,14 @@ lib/
 
 ## 📦 Installation
 
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
 ## 🔧 Configuration
 
 1. Create a `.env.local` file:
-```env
+   ```env
 OPENAI_API_KEY=your_openai_api_key_here
 GITHUB_TOKEN=your_github_token_here
 ```
@@ -53,9 +53,9 @@ GITHUB_TOKEN=your_github_token_here
 
 ## 🚀 Démarrage
 
-```bash
-npm run dev
-```
+   ```bash
+   npm run dev
+   ```
 
 ## 📊 Chatbot Features
 

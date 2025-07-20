@@ -48,7 +48,7 @@ export default function Experience() {
               {experience.current.position} at {experience.current.company}
             </h3>
             <p className="text-gray-400 mb-2">{`${experience.current.start.month}/${experience.current.start.year} – ${experience.current.ongoing ? 'Present' : (experience.current.end ? experience.current.end.month + '/' + experience.current.end.year : 'N/A')}`}</p>
-            <p className="text-gray-300 mb-4">{experience.current.description}</p>
+            <p className="text-gray-300 mb-4 whitespace-pre-wrap">{experience.current.description}</p>
             <div className="flex flex-wrap gap-2">
               {experience.current.technologies?.map((tech: string) => (
                 <span key={tech} className="bg-cyan-700 text-white px-3 py-1 rounded-full text-sm">
@@ -71,7 +71,7 @@ export default function Experience() {
                   {exp.position} at {exp.company}
                 </h3>
                 <p className="text-gray-400 mb-2">{`${exp.start.month}/${exp.start.year} – ${exp.ongoing ? 'Present' : (exp.end ? exp.end.month + '/' + exp.end.year : 'N/A')}`}</p>
-                <p className="text-gray-300 mb-4">{exp.description}</p>
+                <p className="text-gray-300 mb-4 whitespace-pre-wrap">{exp.description}</p>
                 <div className="flex flex-wrap gap-2">
                   {exp.technologies?.map((tech: string) => (
                     <span key={tech} className="bg-cyan-700 text-white px-3 py-1 rounded-full text-sm">

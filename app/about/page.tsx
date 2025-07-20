@@ -6,6 +6,7 @@ import GitHubStats from "@/components/GitHubStats";
 import { dataService } from "@/lib/services/data-service";
 import { useEffect, useState } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { githubSyncService } from "@/lib/services/github-sync";
 
 export default function About() {
   const [personalInfo, setPersonalInfo] = useState<any>(null);
@@ -15,6 +16,7 @@ export default function About() {
   const [skills, setSkills] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
+  const [mainSkills, setMainSkills] = useState<string[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -27,11 +29,24 @@ export default function About() {
         setPersonalInfo(personal);
         setExperience(exp);
         setEducation(edu);
-        // Skills
-        setSkills(await dataService.getSkills?.());
+        // Skills dynamiques (depuis GitHub)
+        try {
+          const skillsByCategory = await githubSyncService.getSkillsByCategory();
+          const programmingSkills = skillsByCategory.programming
+            .sort((a, b) => b.frequency - a.frequency)
+            .map(s => s.name);
+          setMainSkills(programmingSkills.slice(0, 3));
+        } catch (err) {
+          // Fallback local
+          const localSkills = await dataService.getSkills?.();
+          let fallback = localSkills?.programming?.slice(0, 3) || [];
+          setMainSkills(fallback);
+        }
         // Projects (pour le projet vedette)
         const allProjects = await dataService.getProjects?.();
         setProjects(allProjects || []);
+        // Skills locales pour accordéon
+        setSkills(await dataService.getSkills?.());
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
@@ -57,7 +72,6 @@ export default function About() {
 
   // Highlights
   const lastEducation = Array.isArray(education) ? education[0] : null;
-  const mainSkills = skills?.programming?.slice(0, 3) || [];
   const featuredProject = projects.find((p: any) => p.featured) || projects[0];
 
   // Accordéons helpers
@@ -86,7 +100,7 @@ export default function About() {
             <h2 className="text-xl font-bold text-cyan-400 mb-2">Current Experience</h2>
             <div className="text-white font-semibold mb-1">{experience.current.position} at {experience.current.company}</div>
             <div className="text-gray-400 mb-2">{`${experience.current.start.month}/${experience.current.start.year} – ${experience.current.ongoing ? 'Present' : (experience.current.end ? experience.current.end.month + '/' + experience.current.end.year : 'N/A')}`}</div>
-            <div className="text-gray-300 mb-2">{experience.current.description}</div>
+            <div className="text-gray-300 mb-2 whitespace-pre-wrap">{experience.current.description}</div>
             <div className="flex flex-wrap gap-2">
               {experience.current.technologies?.map((tech: string) => (
                 <span key={tech} className="bg-cyan-700 text-white px-3 py-1 rounded-full text-sm">{tech}</span>
@@ -100,7 +114,7 @@ export default function About() {
             <h2 className="text-xl font-bold text-cyan-400 mb-2">Last Education</h2>
             <div className="text-white font-semibold mb-1">{lastEducation.degree} ({lastEducation.program})</div>
             <div className="text-gray-400 mb-2">{lastEducation.institution} • {`${lastEducation.start.month}/${lastEducation.start.year} – ${lastEducation.end ? lastEducation.end.month + '/' + lastEducation.end.year : 'Present'}`}</div>
-            <div className="text-gray-300 mb-2">{lastEducation.description}</div>
+            <div className="text-gray-300 mb-2 whitespace-pre-wrap">{lastEducation.description}</div>
             <div className="flex flex-wrap gap-2">
               {lastEducation.technologies?.map((tech: string) => (
                 <span key={tech} className="bg-cyan-700 text-white px-3 py-1 rounded-full text-sm">{tech}</span>
@@ -125,7 +139,7 @@ export default function About() {
           <div className="bg-gray-800 p-6 rounded-lg">
             <h2 className="text-xl font-bold text-cyan-400 mb-2">Featured Project</h2>
             <div className="text-white font-semibold mb-1">{featuredProject.name}</div>
-            <div className="text-gray-300 mb-2">{featuredProject.description}</div>
+            <div className="text-gray-300 mb-2 whitespace-pre-wrap">{featuredProject.description}</div>
             <div className="flex flex-wrap gap-2 mb-2">
               {featuredProject.technologies?.map((tech: string) => (
                 <span key={tech} className="bg-cyan-700 text-white px-3 py-1 rounded-full text-sm">{tech}</span>
@@ -160,7 +174,7 @@ export default function About() {
                   <div key={index} className="bg-gray-800 p-6 rounded-lg">
                     <div className="text-white font-semibold mb-1">{exp.position} at {exp.company}</div>
                     <div className="text-gray-400 mb-2">{`${exp.start.month}/${exp.start.year} – ${exp.ongoing ? 'Present' : (exp.end ? exp.end.month + '/' + exp.end.year : 'N/A')}`}</div>
-                    <div className="text-gray-300 mb-2">{exp.description}</div>
+                    <div className="text-gray-300 mb-2 whitespace-pre-wrap">{exp.description}</div>
                     <div className="flex flex-wrap gap-2">
                       {exp.technologies?.map((tech: string) => (
                         <span key={tech} className="bg-cyan-700 text-white px-3 py-1 rounded-full text-sm">{tech}</span>
@@ -184,7 +198,7 @@ export default function About() {
                   <div key={idx} className="bg-gray-800 p-6 rounded-lg">
                     <div className="text-white font-semibold mb-1">{edu.degree} ({edu.program})</div>
                     <div className="text-gray-400 mb-2">{edu.institution} • {`${edu.start.month}/${edu.start.year} – ${edu.end ? edu.end.month + '/' + edu.end.year : 'Present'}`}</div>
-                    <div className="text-gray-300 mb-2">{edu.description}</div>
+                    <div className="text-gray-300 mb-2 whitespace-pre-wrap">{edu.description}</div>
                     <div className="flex flex-wrap gap-2 mb-2">
                       {edu.technologies?.map((tech: string) => (
                         <span key={tech} className="bg-cyan-700 text-white px-3 py-1 rounded-full text-sm">{tech}</span>

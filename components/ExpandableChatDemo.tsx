@@ -86,8 +86,8 @@ export function ExpandableChatDemo() {
                   className="h-8 w-8 shrink-0"
                   src={
                     message.role === 'user'
-                      ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&h=64&q=80&crop=faces&fit=crop"
-                      : "/Profile_Pickture_Men.png"
+                      ? "/Profile_Pickture_Women_Anime.png"
+                      : "/Profile_Pickture_Men_Anime.png"
                   }
                   fallback={message.role === 'user' ? 'You' : 'EO'}
                 />
@@ -103,7 +103,7 @@ export function ExpandableChatDemo() {
               <ChatBubble variant="received">
                 <ChatBubbleAvatar
                   className="h-8 w-8 shrink-0"
-                  src="/Profile_Pickture_Men.png"
+                  src="/Profile_Pickture_Men_Anime.png"
                   fallback="EO"
                 />
                 <ChatBubbleMessage isLoading />
@@ -114,7 +114,7 @@ export function ExpandableChatDemo() {
               <ChatBubble variant="received">
                 <ChatBubbleAvatar
                   className="h-8 w-8 shrink-0"
-                  src="/Profile_Pickture_Men.png"
+                  src="/Profile_Pickture_Men_Anime.png"
                   fallback="EO"
                 />
                 <ChatBubbleMessage variant="received">

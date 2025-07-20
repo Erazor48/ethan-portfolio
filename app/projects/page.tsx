@@ -4,6 +4,7 @@
 import ProjectCard from "@/components/ProjectCard";
 import { projectAutomationService } from "@/lib/services/project-automation";
 import { useEffect, useState } from "react";
+import { dataService } from "@/lib/services/data-service";
 
 export default function Projects() {
   const [projects, setProjects] = useState<any[]>([]);
@@ -14,42 +15,46 @@ export default function Projects() {
     const loadProjects = async () => {
       try {
         setLoading(true);
-        const automatedProjects = await projectAutomationService.getAutomatedProjects();
-        
-        // If no automated projects, fallback to featured projects
-        if (automatedProjects.length === 0) {
-          const featuredProjects = await projectAutomationService.getFeaturedProjects();
-          setProjects(featuredProjects);
+        let githubProjects: any[] = [];
+        let localProjects: any[] = [];
+        let useGithub = false;
+        try {
+          githubProjects = await projectAutomationService.getAutomatedProjects();
+          useGithub = Array.isArray(githubProjects) && githubProjects.length > 0;
+        } catch (err) {
+          githubProjects = [];
+          useGithub = false;
+        }
+        // Charger et filtrer les projets locaux pour unicité par id
+        try {
+          const data = await dataService.getPersonalData();
+          const seenIds = new Set<string>();
+          localProjects = (data.projects || []).filter(p => {
+            const id = p.id.trim().toLowerCase();
+            if (seenIds.has(id)) return false;
+            seenIds.add(id);
+            return true;
+          });
+        } catch (err) {
+          localProjects = [];
+        }
+        if (useGithub) {
+          const githubIds = new Set(githubProjects.map(p => p.id.trim().toLowerCase()));
+          const filteredLocal = localProjects.filter(p => {
+            const id = p.id.trim().toLowerCase();
+            return !githubIds.has(id);
+          });
+          setProjects([...githubProjects, ...filteredLocal]);
         } else {
-          setProjects(automatedProjects);
+          setProjects(localProjects);
         }
       } catch (error) {
         console.error('Error loading projects:', error);
         setError('Failed to load projects');
-        // Fallback to default projects
-        setProjects([
-          {
-            id: "eviverse",
-            name: "Eviverse",
-            description: "🛠️ 3D Object Generator – SaaS Project (in progress) Personal project to build a 3D object generator, aiming to become a SaaS platform with project thread management.",
-            technologies: ["FastAPI", "SQLAlchemy", "React", "Tailwind CSS"],
-            githubUrl: "https://github.com/Erazor48/Eviverse",
-            featured: true
-          },
-          {
-            id: "youtube-clip-extractor",
-            name: "YouTube Video Clip Extractor",
-            description: "🎞️ YouTube Clip Extractor is a bilingual web application that lets you extract high-quality clips from any YouTube video in just a few clicks.",
-            technologies: ["Gradio", "MoviePy", "yt-dlp"],
-            githubUrl: "https://github.com/Erazor48/youtube-clip-extractor",
-            featured: true
-          }
-        ]);
       } finally {
         setLoading(false);
       }
     };
-
     loadProjects();
   }, []);
 
