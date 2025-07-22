@@ -36,7 +36,9 @@ export class ProjectAutomationService {
         id: project.name,
         name: project.name,
         description: project.description || 'GitHub Project',
-        technologies: [project.language].filter(Boolean),
+        technologies: Array.from(new Set([
+          ...(project.topics || [])
+        ])),
         githubUrl: project.html_url,
         liveUrl: project.homepage,
         featured: project.stargazers_count > 5 || project.forks_count > 2,
@@ -94,9 +96,7 @@ export class ProjectAutomationService {
     
     const topTechnologies = Object.entries(techCount)
       .sort(([,a], [,b]) => b - a)
-      .slice(0, 5)
       .map(([tech]) => tech);
-
     return {
       totalProjects: projects.length,
       totalStars,

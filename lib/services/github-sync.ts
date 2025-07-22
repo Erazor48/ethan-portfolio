@@ -23,6 +23,7 @@ export interface GitHubSkill {
 
 // Nouveau mapping éditable et patterns pour la catégorisation
 export const skillCategoryMapping: Record<string, string> = {
+  // Programming
   python: 'programming',
   javascript: 'programming',
   typescript: 'programming',
@@ -36,6 +37,9 @@ export const skillCategoryMapping: Record<string, string> = {
   ruby: 'programming',
   swift: 'programming',
   kotlin: 'programming',
+  'batch-file': 'programming',
+
+  // Frameworks
   react: 'framework',
   vue: 'framework',
   angular: 'framework',
@@ -53,6 +57,12 @@ export const skillCategoryMapping: Record<string, string> = {
   tensorflow: 'framework',
   langchain: 'framework',
   transformers: 'framework',
+  gradio: 'framework',
+  pygame: 'framework',
+  tkinter: 'framework',
+  'tailwind-css': 'framework',
+
+  // Tools
   git: 'tool',
   docker: 'tool',
   kubernetes: 'tool',
@@ -64,6 +74,11 @@ export const skillCategoryMapping: Record<string, string> = {
   cursor: 'tool',
   postman: 'tool',
   figma: 'tool',
+  giskard: 'tool',
+  'llm-security': 'tool',
+  'prompt-injection': 'tool',
+
+  // Databases
   mysql: 'database',
   postgresql: 'database',
   mongodb: 'database',
@@ -71,6 +86,9 @@ export const skillCategoryMapping: Record<string, string> = {
   sqlite: 'database',
   elasticsearch: 'database',
   cassandra: 'database',
+  sqlalchemy: 'database',
+
+  // Platforms
   aws: 'platform',
   azure: 'platform',
   gcp: 'platform',
@@ -78,18 +96,30 @@ export const skillCategoryMapping: Record<string, string> = {
   netlify: 'platform',
   heroku: 'platform',
   digitalocean: 'platform',
+  youtube: 'platform',
+
+  // Other / Concepts / Soft Skills
+  bilingual: 'other',
+  'video-extraction': 'other',
+  'web-application': 'other',
+  'music-player': 'other',
+  'ai-safety': 'other'
 };
 
 export function categorizeSkill(skill: string): string {
   const s = skill.toLowerCase();
   if (skillCategoryMapping[s]) return skillCategoryMapping[s];
+
+  // Fallback : règles dynamiques
   if (s.includes('js') || s.includes('react') || s.includes('vue') || s.includes('angular')) return 'framework';
-  if (s.includes('python') || s.includes('typescript') || s.includes('java')) return 'programming';
-  if (s.includes('docker') || s.includes('github') || s.includes('vercel')) return 'tool';
+  if (s.includes('python') || s.includes('typescript') || s.includes('java') || s.includes('c++')) return 'programming';
+  if (s.includes('docker') || s.includes('github') || s.includes('vercel') || s.includes('tool')) return 'tool';
   if (s.includes('sql') || s.includes('mongo') || s.includes('db')) return 'database';
-  if (s.includes('aws') || s.includes('azure') || s.includes('gcp')) return 'platform';
+  if (s.includes('aws') || s.includes('azure') || s.includes('gcp') || s.includes('platform')) return 'platform';
+
   return 'other';
 }
+
 
 export class GitHubSyncService {
   private static instance: GitHubSyncService;
@@ -113,7 +143,7 @@ export class GitHubSyncService {
 
     try {
       const headers: HeadersInit = {
-        'Accept': 'application/vnd.github.v3+json',
+        'Accept': 'application/vnd.github.mercy-preview+json',
         'User-Agent': 'Ethan-Portfolio-App'
       };
 
@@ -123,6 +153,7 @@ export class GitHubSyncService {
         headers['Authorization'] = `token ${githubToken}`;
       }
 
+      // 1. Récupérer la liste des repos
       const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=20`, {
         headers
       });
@@ -139,14 +170,28 @@ export class GitHubSyncService {
       }
       
       const projects: GitHubProject[] = await response.json();
-      
+
+      // 2. Pour chaque repo, enrichir avec les topics via /repos/:owner/:repo
+      const enrichedProjects = await Promise.all(projects.map(async (project) => {
+        try {
+          const repoResp = await fetch(`https://api.github.com/repos/${username}/${project.name}`, { headers });
+          if (repoResp.ok) {
+            const repoData = await repoResp.json();
+            return { ...project, topics: repoData.topics || [] };
+          }
+        } catch (err) {
+          // ignore, fallback to original project
+        }
+        return { ...project, topics: project.topics || [] };
+      }));
+
       // Cache the results
       this.cache.set(cacheKey, {
-        data: projects,
+        data: enrichedProjects,
         timestamp: Date.now()
       });
       
-      return projects;
+      return enrichedProjects;
     } catch (error) {
       console.error('Error fetching GitHub projects:', error);
       return [];
@@ -161,9 +206,10 @@ export class GitHubSyncService {
     const skillMap = new Map<string, GitHubSkill>();
 
     projects.forEach(project => {
-      // Langage principal
+      // Main Language
       if (project.language) {
-        const cat = categorizeSkill(project.language);
+        //const cat = categorizeSkill(project.language); It's not necessary to use categorizeSkill. All are programming.
+        const cat = 'programming';
         this.addSkillToMap(skillMap, project.language, cat, project);
       }
       // Topics
@@ -171,18 +217,7 @@ export class GitHubSyncService {
         const cat = categorizeSkill(topic);
         this.addSkillToMap(skillMap, topic, cat, project);
       });
-      // Description
-      if (project.description) {
-        const descLower = project.description.toLowerCase();
-        Object.keys(skillCategoryMapping).forEach(skill => {
-          if (descLower.includes(skill)) {
-            const cat = skillCategoryMapping[skill] || 'other';
-            this.addSkillToMap(skillMap, skill, cat, project);
-          }
-        });
-      }
     });
-
     return Array.from(skillMap.values()).sort((a, b) => b.frequency - a.frequency);
   }
 
