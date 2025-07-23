@@ -5,7 +5,6 @@ import { TbFileCv } from "react-icons/tb";
 import { SiGithub, SiLinkedin } from "react-icons/si";
 import { dataService } from "@/lib/services/data-service";
 import { useEffect, useState } from "react";
-import NeuralNetworkBackground from "@/components/NeuralNetworkBackground";
 
 export default function Hero() {
   const [personalInfo, setPersonalInfo] = useState<any>(null);
@@ -60,8 +59,6 @@ export default function Hero() {
         />
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0a223a] to-transparent" />
       </div>
-      {/* Neural network background effect */}
-      <NeuralNetworkBackground className="absolute inset-0 z-0 pointer-events-none" />
       {/* Main content with animated appearance */}
       <div className="relative flex flex-col items-center -mt-20 z-10">
         <div className="relative animate-fadeInUp" style={{ animationDelay: "0.1s" }}>
