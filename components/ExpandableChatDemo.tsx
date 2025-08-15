@@ -54,11 +54,11 @@ export function ExpandableChatDemo() {
       >
         <ExpandableChatHeader className="flex-col text-center justify-center">
           <h1 className="text-xl font-semibold">Chat with Ethan ✨</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-primary-fg">
             Ask me questions about my skills, projects, and experience
           </p>
-          <div className="bg-green-50 border border-green-200 rounded-lg p-3 py-1 my-1">{/*p-3 mb-4 Old version as I can restore.*/}
-            <p className="text-sm text-green-800">
+          <div className="bg-chat-explanation border border-chat-explanation-border rounded-lg px-3 py-1 my-1">
+            <p className="text-sm text-chat-explanation-fg">
               🤖 AI Assistant powered by LangChain
               <br/>
               Data synchronized with GitHub in real-time
@@ -118,7 +118,7 @@ export function ExpandableChatDemo() {
                   fallback="EO"
                 />
                 <ChatBubbleMessage variant="received">
-                  <div className="text-red-500 text-sm">
+                  <div className="text-destructive-fg text-sm">
                     Error: {error}
                   </div>
                 </ChatBubbleMessage>

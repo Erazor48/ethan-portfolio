@@ -14,39 +14,39 @@ interface SkillCategory {
 const skillCategories: Record<string, SkillCategory> = {
   programming: {
     name: "Programming Languages",
-    color: "text-blue-400",
-    bgColor: "bg-blue-900/20",
-    borderColor: "border-blue-500/30"
+    color: `text-skills-primary-fg`,
+    bgColor: `bg-skills-primary`,
+    borderColor: `border-skills-primary-border`
   },
   framework: {
     name: "Frameworks & Libraries",
-    color: "text-green-400",
-    bgColor: "bg-green-900/20",
-    borderColor: "border-green-500/30"
+    color: `text-skills-secondary-fg`,
+    bgColor: `bg-skills-secondary`,
+    borderColor: `border-skills-secondary-border`
   },
   tool: {
     name: "Tools & Platforms",
-    color: "text-purple-400",
-    bgColor: "bg-purple-900/20",
-    borderColor: "border-purple-500/30"
+    color: `text-skills-tertiary-fg`,
+    bgColor: `bg-skills-tertiary`,
+    borderColor: `border-skills-tertiary-border`
   },
   database: {
     name: "Databases",
-    color: "text-orange-400",
-    bgColor: "bg-orange-900/20",
-    borderColor: "border-orange-500/30"
+    color: `text-skills-quaternary-fg`,
+    bgColor: `bg-skills-quaternary`,
+    borderColor: `border-skills-quaternary-border`
   },
   platform: {
     name: "Cloud & Platforms",
-    color: "text-cyan-400",
-    bgColor: "bg-cyan-900/20",
-    borderColor: "border-cyan-500/30"
+    color: `text-skills-quinary-fg`,
+    bgColor: `bg-skills-quinary`,
+    borderColor: `border-skills-quinary-border`
   },
   other: {
     name: "Other / Uncategorized",
-    color: "text-gray-300",
-    bgColor: "bg-gray-700/20",
-    borderColor: "border-gray-500/30"
+    color: `text-skills-senary-fg`,
+    bgColor: `bg-skills-senary`,
+    borderColor: `border-skills-senary-border`
   }
 };
 
@@ -73,15 +73,15 @@ export default function SkillsGrid() {
 
   if (loading) {
     return (
-      <section className="px-8 py-12 bg-gray-800">
-        <h2 className="text-2xl font-bold text-cyan-400 mb-6">My Skills</h2>
+      <section className="px-8 py-12 bg-card">
+        <h2 className="text-2xl font-bold text-secondary-fg mb-6">My Skills</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="animate-pulse">
-              <div className="h-6 bg-gray-700 rounded mb-4"></div>
+              <div className="h-6 bg-muted-primary rounded mb-4"></div>
               <div className="flex flex-wrap gap-2">
                 {[...Array(4)].map((_, j) => (
-                  <div key={j} className="h-8 w-20 bg-gray-700 rounded"></div>
+                  <div key={j} className="h-8 w-20 bg-muted-primary rounded"></div>
                 ))}
               </div>
             </div>
@@ -96,9 +96,9 @@ export default function SkillsGrid() {
 
   if (!hasSkills) {
     return (
-      <section className="px-8 py-12 bg-gray-800">
-        <h2 className="text-2xl font-bold text-cyan-400 mb-6">My Skills</h2>
-        <div className="text-center text-gray-400">
+      <section className="px-8 py-12 bg-card rounded-lg">
+        <h2 className="text-2xl font-bold text-secondary-fg mb-6">My Skills</h2>
+        <div className="text-center text-muted-primary-fg">
           <p>Skills will be automatically extracted from my GitHub projects.</p>
           <p className="text-sm mt-2">Check back soon for updated skills!</p>
         </div>
@@ -107,8 +107,8 @@ export default function SkillsGrid() {
   }
 
   return (
-    <section className="px-8 py-12 bg-gray-800">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">My Skills</h2>
+    <section className="px-8 py-12 bg-card rounded-lg">
+      <h2 className="text-2xl font-bold text-secondary-fg mb-6">My Skills</h2>
       
       {/* Skills Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -141,17 +141,17 @@ export default function SkillsGrid() {
       </div>
 
       {/* Legend */}
-      <div className="mt-8 p-4 bg-gray-700 rounded-lg">
-        <h4 className="text-sm font-semibold text-gray-300 mb-3">Legend</h4>
+      <div className="mt-8 p-4 bg-skills-legende rounded-lg">
+        <h4 className="text-sm font-semibold text-skills-legende-fg mb-3">Legend</h4>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {Object.entries(skillCategories).map(([key, category]) => (
             <div key={key} className="flex items-center gap-2">
               <div className={`w-3 h-3 rounded-full ${category.bgColor} ${category.borderColor} border`}></div>
-              <span className="text-xs text-gray-400">{category.name}</span>
+              <span className="text-xs text-muted-primary-fg">{category.name}</span>
             </div>
           ))}
         </div>
-        <p className="text-xs text-gray-500 mt-3">
+        <p className="text-xs text-muted-secondary-fg mt-3">
           Numbers indicate how many projects use each skill. Hover for details.
         </p>
       </div>
