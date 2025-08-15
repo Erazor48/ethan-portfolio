@@ -1,0 +1,12 @@
+# Forcer LF uniquement pour ce projet
+* text=auto eol=lf
+
+# Extensions du projet Next.js/Tailwind
+*.js   text eol=lf
+*.ts   text eol=lf
+*.jsx  text eol=lf
+*.tsx  text eol=lf
+*.css  text eol=lf
+*.scss text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
