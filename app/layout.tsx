@@ -15,7 +15,28 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="dark bg-gray-900 text-white min-h-screen flex flex-col">
+      <head>
+        {/* Script to set the theme before rendering to avoid flashing */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem('theme');
+                  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  var dark = saved === 'dark' || (!saved && prefersDark);
+                  if (dark) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (_) {}
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body className="bg-background text-foreground min-h-screen flex flex-col">
         <Navbar />
         {children}
         <ExpandableChatDemo />

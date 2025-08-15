@@ -7,51 +7,117 @@ module.exports = {
     ],
     theme: {
     	extend: {
-    		borderRadius: {
+			borderRadius: {
     			lg: 'var(--radius)',
     			md: 'calc(var(--radius) - 2px)',
     			sm: 'calc(var(--radius) - 4px)'
     		},
+			backgroundImage: {
+				'gradient-top': 'linear-gradient(to top, hsl(var(--gradient-a)), transparent)',
+  				'gradient-bottom': 'linear-gradient(to bottom, hsl(var(--gradient-a)), hsl(var(--gradient-b)))'
+			  },
     		colors: {
     			background: 'hsl(var(--background))',
-    			foreground: 'hsl(var(--foreground))',
+				foreground: {
+					DEFAULT: "hsl(var(--foreground))",
+					secondary: "hsl(var(--foreground-secondary))"
+				},
     			card: {
     				DEFAULT: 'hsl(var(--card))',
-    				foreground: 'hsl(var(--card-foreground))'
+    				fg: 'hsl(var(--card-fg))'
     			},
-    			popover: {
-    				DEFAULT: 'hsl(var(--popover))',
-    				foreground: 'hsl(var(--popover-foreground))'
-    			},
-    			primary: {
+				blur: 'hsl(var(--blur))',
+				bio: 'hsl(var(--bio))',
+				'hero-button': {
+					DEFAULT: 'hsl(var(--hero-button))',
+    				hover: 'hsl(var(--hero-button-hover))'
+				},
+				'navbar-emphasis': 'hsl(var(--navbar-emphasis))',
+				primary: {
     				DEFAULT: 'hsl(var(--primary))',
-    				foreground: 'hsl(var(--primary-foreground))'
+    				fg: 'hsl(var(--primary-fg))'
     			},
     			secondary: {
     				DEFAULT: 'hsl(var(--secondary))',
-    				foreground: 'hsl(var(--secondary-foreground))'
+    				fg: 'hsl(var(--secondary-fg))',
+					'emphasis-fg': 'hsl(var(--secondary-emphasis-fg))'
     			},
-    			muted: {
-    				DEFAULT: 'hsl(var(--muted))',
-    				foreground: 'hsl(var(--muted-foreground))'
-    			},
+				muted: {
+					primary: {
+						DEFAULT: 'hsl(var(--muted-primary))',
+    					fg: 'hsl(var(--muted-primary-fg))'
+					},
+					secondary: {
+						DEFAULT: 'hsl(var(--muted-secondary))',
+    					fg: 'hsl(var(--muted-secondary-fg))'
+					}
+				},
     			accent: {
     				DEFAULT: 'hsl(var(--accent))',
-    				foreground: 'hsl(var(--accent-foreground))'
+    				fg: 'hsl(var(--accent-fg))'
     			},
     			destructive: {
     				DEFAULT: 'hsl(var(--destructive))',
-    				foreground: 'hsl(var(--destructive-foreground))'
+    				fg: 'hsl(var(--destructive-fg))'
     			},
-    			border: 'hsl(var(--border))',
-    			input: 'hsl(var(--input))',
-    			ring: 'hsl(var(--ring))',
-    			chart: {
-    				'1': 'hsl(var(--chart-1))',
-    				'2': 'hsl(var(--chart-2))',
-    				'3': 'hsl(var(--chart-3))',
-    				'4': 'hsl(var(--chart-4))',
-    				'5': 'hsl(var(--chart-5))'
+				border: {
+    				DEFAULT: 'hsl(var(--border))',
+    				pickture: 'hsl(var(--border-pickture))'
+    			},
+				chat: {
+					explanation: {
+						DEFAULT: 'hsl(var(--chat-explanation))',
+						fg: 'hsl(var(--chat-explanation-fg))',
+						border: 'hsl(var(--chat-explanation-border))'
+					},
+					input: 'hsl(var(--chat-input))',
+					ring: 'hsl(var(--chat-ring))',
+					shadow: 'hsl(var(--chat-shadow))',
+					'button-primary': {
+						DEFAULT: 'hsl(var(--chat-button-primary))',
+						fg: 'hsl(var(--chat-button-primary-fg))'
+					},
+				},
+				skills: {
+    				DEFAULT: 'hsl(var(--skills))',
+					projects: {
+						DEFAULT: 'hsl(var(--skills-projects))',
+						fg: 'hsl(var(--skills-projects-fg))'
+					},
+					primary: {
+						DEFAULT: 'hsl(var(--skills-primary))',
+						fg: 'hsl(var(--skills-primary-fg))',
+						border: 'hsl(var(--skills-primary-border))'
+					},
+					secondary: {
+						DEFAULT: 'hsl(var(--skills-secondary))',
+						fg: 'hsl(var(--skills-secondary-fg))',
+						border: 'hsl(var(--skills-secondary-border))'
+					},
+					tertiary: {
+						DEFAULT: 'hsl(var(--skills-tertiary))',
+						fg: 'hsl(var(--skills-tertiary-fg))',
+						border: 'hsl(var(--skills-tertiary-border))'
+					},
+					quaternary: {
+						DEFAULT: 'hsl(var(--skills-quaternary))',
+						fg: 'hsl(var(--skills-quaternary-fg))',
+						border: 'hsl(var(--skills-quaternary-border))'
+					},
+					quinary: {
+						DEFAULT: 'hsl(var(--skills-quinary))',
+						fg: 'hsl(var(--skills-quinary-fg))',
+						border: 'hsl(var(--skills-quinary-border))'
+					},
+					senary: {
+						DEFAULT: 'hsl(var(--skills-senary))',
+						fg: 'hsl(var(--skills-senary-fg))',
+						border: 'hsl(var(--skills-senary-border))'
+					},
+					legende: {
+						DEFAULT: 'hsl(var(--skills-legende))',
+						fg: 'hsl(var(--skills-legende-fg))'
+					}
     			}
     		}
     	}

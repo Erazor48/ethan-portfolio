@@ -61,15 +61,15 @@ export default function Projects() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white p-8">
-        <h1 className="text-3xl font-bold text-cyan-400 mb-6">My Projects</h1>
+      <div className="min-h-screen bg-background text-primary-fg p-8">
+        <h1 className="text-3xl font-bold text-secondary-fg mb-6">My Projects</h1>
         <div className="grid gap-6 md:grid-cols-2">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-gray-800 p-6 rounded-lg animate-pulse">
-              <div className="h-6 bg-gray-700 rounded mb-4"></div>
-              <div className="h-4 bg-gray-700 rounded mb-2"></div>
-              <div className="h-4 bg-gray-700 rounded mb-4"></div>
-              <div className="h-20 bg-gray-700 rounded"></div>
+            <div key={i} className="bg-card p-6 rounded-lg animate-pulse">
+              <div className="h-6 bg-muted-primary rounded mb-4"></div>
+              <div className="h-4 bg-muted-primary rounded mb-2"></div>
+              <div className="h-4 bg-muted-primary rounded mb-4"></div>
+              <div className="h-20 bg-muted-primary rounded"></div>
             </div>
           ))}
         </div>
@@ -79,9 +79,9 @@ export default function Projects() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white p-8">
-        <h1 className="text-3xl font-bold text-cyan-400 mb-6">My Projects</h1>
-        <div className="text-red-400 mb-6">{error}</div>
+      <div className="min-h-screen bg-background text-primary-fg p-8">
+        <h1 className="text-3xl font-bold text-secondary-fg mb-6">My Projects</h1>
+        <div className="text-destructive-fg mb-6">{error}</div>
         <div className="grid gap-6 md:grid-cols-2">
           {projects.map((project) => (
             <ProjectCard
@@ -98,9 +98,9 @@ export default function Projects() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
+    <div className="min-h-screen bg-background text-primary-fg p-8">
       <AnimatedSection delay={0.1}>
-        <h1 className="text-3xl font-bold text-cyan-400 mb-6">My Projects</h1>
+        <h1 className="text-3xl font-bold text-secondary-fg mb-6">My Projects</h1>
       </AnimatedSection>
       <AnimatedSection delay={0.2}>
         <div className="grid gap-6 md:grid-cols-2">

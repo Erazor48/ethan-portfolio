@@ -59,13 +59,13 @@ export default function About() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white p-8">
-        <h1 className="text-3xl font-bold text-cyan-400 mb-6">About me</h1>
+      <div className="min-h-screen bg-background p-8">
+        <h1 className="text-3xl font-bold text-secondary-fg mb-6">About me</h1>
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-700 rounded mb-4"></div>
-          <div className="h-4 bg-gray-700 rounded mb-4"></div>
-          <div className="h-4 bg-gray-700 rounded mb-4"></div>
-          <div className="h-4 bg-gray-700 rounded mb-4"></div>
+          <div className="h-4 bg-muted-primary rounded mb-4"></div>
+          <div className="h-4 bg-muted-primary rounded mb-4"></div>
+          <div className="h-4 bg-muted-primary rounded mb-4"></div>
+          <div className="h-4 bg-muted-primary rounded mb-4"></div>
         </div>
       </div>
     );
@@ -81,12 +81,12 @@ export default function About() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
+    <div className="min-h-screen bg-background text-primary-fg p-8">
       <AnimatedSection delay={0.1}>
         <section className="text-center py-10 px-4">
           <h1 className="text-4xl font-bold mb-2">{personalInfo?.name || "Ethan Orain"}</h1>
-          <p className="text-cyan-400 text-lg mb-2">{personalInfo?.bio || "AI Engineer · NLP · Neural Networks · LLMs Enthusiast"}</p>
-          <div className="flex justify-center gap-6 mb-4 text-gray-300">
+          <p className="text-secondary-fg text-lg mb-2">{personalInfo?.bio || "AI Engineer · NLP · Neural Networks · LLMs Enthusiast"}</p>
+          <div className="flex justify-center gap-6 mb-4 text-foreground">
             <a href={personalInfo?.github || "https://github.com/Erazor48"} target="_blank" rel="noreferrer">GitHub</a>
             <a href={personalInfo?.linkedin || "https://www.linkedin.com/in/ethan-orain"} target="_blank" rel="noreferrer">LinkedIn</a>
             <a href="/CV 3-4 months EV.pdf" target="_blank" rel="noreferrer">CV</a>
@@ -97,65 +97,65 @@ export default function About() {
         <section className="grid md:grid-cols-2 gap-8 mb-8">
           {/* Expérience actuelle */}
           {experience?.current && (
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <h2 className="text-xl font-bold text-cyan-400 mb-2">Current Experience</h2>
-              <div className="text-white font-semibold mb-1">{experience.current.position} at {experience.current.company}</div>
-              <div className="text-gray-400 mb-2">{`${experience.current.start.month}/${experience.current.start.year} – ${experience.current.ongoing ? 'Present' : (experience.current.end ? experience.current.end.month + '/' + experience.current.end.year : 'N/A')}`}</div>
-              <div className="text-gray-300 mb-2 whitespace-pre-wrap">{experience.current.description}</div>
+            <div className="bg-card p-6 rounded-lg">
+              <h2 className="text-xl font-bold text-secondary-fg mb-2">Current Experience</h2>
+              <div className="text-primary-fg font-semibold mb-1">{experience.current.position} at {experience.current.company}</div>
+              <div className="text-muted-primary-fg mb-2">{`${experience.current.start.month}/${experience.current.start.year} – ${experience.current.ongoing ? 'Present' : (experience.current.end ? experience.current.end.month + '/' + experience.current.end.year : 'N/A')}`}</div>
+              <div className="text-card-fg mb-2 whitespace-pre-wrap">{experience.current.description}</div>
               <div className="flex flex-wrap gap-2">
                 {experience.current.technologies?.map((tech: string) => (
-                  <span key={tech} className="bg-cyan-700 text-white px-3 py-1 rounded-full text-sm">{tech}</span>
+                  <span key={tech} className="bg-skills text-primary-fg px-3 py-1 rounded-full text-sm">{tech}</span>
                 ))}
               </div>
             </div>
           )}
           {/* Dernier diplôme */}
           {lastEducation && (
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <h2 className="text-xl font-bold text-cyan-400 mb-2">Last Education</h2>
-              <div className="text-white font-semibold mb-1">{lastEducation.degree} ({lastEducation.program})</div>
-              <div className="text-gray-400 mb-2">{lastEducation.institution} • {`${lastEducation.start.month}/${lastEducation.start.year} – ${lastEducation.end ? lastEducation.end.month + '/' + lastEducation.end.year : 'Present'}`}</div>
-              <div className="text-gray-300 mb-2 whitespace-pre-wrap">{lastEducation.description}</div>
+            <div className="bg-card p-6 rounded-lg">
+              <h2 className="text-xl font-bold text-secondary-fg mb-2">Last Education</h2>
+              <div className="text-primary-fg font-semibold mb-1">{lastEducation.degree} ({lastEducation.program})</div>
+              <div className="text-muted-primary-fg mb-2">{lastEducation.institution} • {`${lastEducation.start.month}/${lastEducation.start.year} – ${lastEducation.end ? lastEducation.end.month + '/' + lastEducation.end.year : 'Present'}`}</div>
+              <div className="text-card-fg mb-2 whitespace-pre-wrap">{lastEducation.description}</div>
               <div className="flex flex-wrap gap-2">
                 {lastEducation.technologies?.map((tech: string) => (
-                  <span key={tech} className="bg-cyan-700 text-white px-3 py-1 rounded-full text-sm">{tech}</span>
+                  <span key={tech} className="bg-skills text-primary-fg px-3 py-1 rounded-full text-sm">{tech}</span>
                 ))}
               </div>
               {typeof lastEducation.grade === 'number' && (
-                <div className="text-gray-400 text-sm mt-2">Grade: {lastEducation.grade}</div>
+                <div className="text-muted-primary-fg text-sm mt-2">Grade: {lastEducation.grade}</div>
               )}
             </div>
           )}
           {/* Skills principaux */}
-          <div className="bg-gray-800 p-6 rounded-lg">
-            <h2 className="text-xl font-bold text-cyan-400 mb-2">Main Skills</h2>
+          <div className="bg-card p-6 rounded-lg">
+            <h2 className="text-xl font-bold text-secondary-fg mb-2">Main Skills</h2>
             <div className="flex flex-wrap gap-2">
               {mainSkills.map((skill: string) => (
-                <span key={skill} className="bg-cyan-700 text-white px-3 py-1 rounded-full text-sm">{skill}</span>
+                <span key={skill} className="bg-skills text-primary-fg px-3 py-1 rounded-full text-sm">{skill}</span>
               ))}
             </div>
           </div>
           {/* Projet vedette */}
           {featuredProject && (
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <h2 className="text-xl font-bold text-cyan-400 mb-2">Featured Project</h2>
-              <div className="text-white font-semibold mb-1">{featuredProject.name}</div>
-              <div className="text-gray-300 mb-2 whitespace-pre-wrap">{featuredProject.description}</div>
+            <div className="bg-card p-6 rounded-lg">
+              <h2 className="text-xl font-bold text-secondary-fg mb-2">Featured Project</h2>
+              <div className="text-primary-fg font-semibold mb-1">{featuredProject.name}</div>
+              <div className="text-card-fg mb-2 whitespace-pre-wrap">{featuredProject.description}</div>
               <div className="flex flex-wrap gap-2 mb-2">
                 {featuredProject.technologies?.map((tech: string) => (
-                  <span key={tech} className="bg-cyan-700 text-white px-3 py-1 rounded-full text-sm">{tech}</span>
+                  <span key={tech} className="bg-skills text-primary-fg px-3 py-1 rounded-full text-sm">{tech}</span>
                 ))}
               </div>
               {featuredProject.start && featuredProject.end && (
-                <div className="text-gray-400 text-sm mb-2">
+                <div className="text-muted-primary-fg text-sm mb-2">
                   {`${featuredProject.start.month}/${featuredProject.start.year} – ${featuredProject.ongoing ? 'Present' : (featuredProject.end ? featuredProject.end.month + '/' + featuredProject.end.year : 'N/A')}`}
                 </div>
               )}
               {featuredProject.githubUrl && (
-                <a href={featuredProject.githubUrl} target="_blank" rel="noreferrer" className="text-cyan-400 underline">GitHub</a>
+                <a href={featuredProject.githubUrl} target="_blank" rel="noreferrer" className="text-secondary-fg underline">GitHub</a>
               )}
               {featuredProject.liveUrl && (
-                <span> | <a href={featuredProject.liveUrl} target="_blank" rel="noreferrer" className="text-cyan-400 underline">Live</a></span>
+                <span> | <a href={featuredProject.liveUrl} target="_blank" rel="noreferrer" className="text-secondary-fg underline">Live</a></span>
               )}
             </div>
           )}
@@ -166,19 +166,19 @@ export default function About() {
           {/* Expériences précédentes */}
           {experience?.previous && experience.previous.length > 0 && (
             <div className="mb-4">
-              <button onClick={() => toggleAccordion('previousExp')} className="flex items-center text-cyan-400 font-bold mb-2">
+              <button onClick={() => toggleAccordion('previousExp')} className="flex items-center text-secondary-fg font-bold mb-2">
                 Previous Experiences {openAccordion === 'previousExp' ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
               </button>
               {openAccordion === 'previousExp' && (
                 <div className="space-y-4">
                   {experience.previous.map((exp: any, index: number) => (
-                    <div key={index} className="bg-gray-800 p-6 rounded-lg">
-                      <div className="text-white font-semibold mb-1">{exp.position} at {exp.company}</div>
-                      <div className="text-gray-400 mb-2">{`${exp.start.month}/${exp.start.year} – ${exp.ongoing ? 'Present' : (exp.end ? exp.end.month + '/' + exp.end.year : 'N/A')}`}</div>
-                      <div className="text-gray-300 mb-2 whitespace-pre-wrap">{exp.description}</div>
+                    <div key={index} className="bg-card p-6 rounded-lg">
+                      <div className="text-primary-fg font-semibold mb-1">{exp.position} at {exp.company}</div>
+                      <div className="text-muted-primary-fg mb-2">{`${exp.start.month}/${exp.start.year} – ${exp.ongoing ? 'Present' : (exp.end ? exp.end.month + '/' + exp.end.year : 'N/A')}`}</div>
+                      <div className="text-card-fg mb-2 whitespace-pre-wrap">{exp.description}</div>
                       <div className="flex flex-wrap gap-2">
                         {exp.technologies?.map((tech: string) => (
-                          <span key={tech} className="bg-cyan-700 text-white px-3 py-1 rounded-full text-sm">{tech}</span>
+                          <span key={tech} className="bg-skills text-primary-fg px-3 py-1 rounded-full text-sm">{tech}</span>
                         ))}
                       </div>
                     </div>
@@ -190,23 +190,23 @@ export default function About() {
           {/* Toutes les formations */}
           {education && Array.isArray(education) && education.length > 1 && (
             <div className="mb-4">
-              <button onClick={() => toggleAccordion('allEdu')} className="flex items-center text-cyan-400 font-bold mb-2">
+              <button onClick={() => toggleAccordion('allEdu')} className="flex items-center text-secondary-fg font-bold mb-2">
                 All Education {openAccordion === 'allEdu' ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
               </button>
               {openAccordion === 'allEdu' && (
                 <div className="space-y-4">
                   {education.slice(1).map((edu: any, idx: number) => (
-                    <div key={idx} className="bg-gray-800 p-6 rounded-lg">
-                      <div className="text-white font-semibold mb-1">{edu.degree} ({edu.program})</div>
-                      <div className="text-gray-400 mb-2">{edu.institution} • {`${edu.start.month}/${edu.start.year} – ${edu.end ? edu.end.month + '/' + edu.end.year : 'Present'}`}</div>
-                      <div className="text-gray-300 mb-2 whitespace-pre-wrap">{edu.description}</div>
+                    <div key={idx} className="bg-card p-6 rounded-lg">
+                      <div className="text-primary-fg font-semibold mb-1">{edu.degree} ({edu.program})</div>
+                      <div className="text-muted-primary-fg mb-2">{edu.institution} • {`${edu.start.month}/${edu.start.year} – ${edu.end ? edu.end.month + '/' + edu.end.year : 'Present'}`}</div>
+                      <div className="text-card-fg mb-2 whitespace-pre-wrap">{edu.description}</div>
                       <div className="flex flex-wrap gap-2 mb-2">
                         {edu.technologies?.map((tech: string) => (
-                          <span key={tech} className="bg-cyan-700 text-white px-3 py-1 rounded-full text-sm">{tech}</span>
+                          <span key={tech} className="bg-skills text-primary-fg px-3 py-1 rounded-full text-sm">{tech}</span>
                         ))}
                       </div>
                       {typeof edu.grade === 'number' && (
-                        <div className="text-gray-400 text-sm mt-2">Grade: {edu.grade}</div>
+                        <div className="text-muted-primary-fg text-sm mt-2">Grade: {edu.grade}</div>
                       )}
                     </div>
                   ))}
@@ -217,7 +217,7 @@ export default function About() {
           {/* Toutes les compétences */}
           {skills && (
             <div className="mb-4">
-              <button onClick={() => toggleAccordion('allSkills')} className="flex items-center text-cyan-400 font-bold mb-2">
+              <button onClick={() => toggleAccordion('allSkills')} className="flex items-center text-secondary-fg font-bold mb-2">
                 All Skills {openAccordion === 'allSkills' ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
               </button>
               {openAccordion === 'allSkills' && (
@@ -229,11 +229,11 @@ export default function About() {
           )}
           {/* Stats GitHub */}
           <div className="mb-4">
-            <button onClick={() => toggleAccordion('githubStats')} className="flex items-center text-cyan-400 font-bold mb-2">
+            <button onClick={() => toggleAccordion('githubStats')} className="flex items-center text-secondary-fg font-bold mb-2">
               GitHub Statistics {openAccordion === 'githubStats' ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
             </button>
             {openAccordion === 'githubStats' && (
-              <div className="bg-gray-800 p-6 rounded-lg">
+              <div className="bg-card p-6 rounded-lg">
                 <GitHubStats />
               </div>
             )}
@@ -242,9 +242,9 @@ export default function About() {
       </AnimatedSection>
       <AnimatedSection delay={0.7}>
         <section className="flex flex-wrap gap-4 mt-8">
-          <a href="/experience" className="text-cyan-400 underline">View all my experience</a>
-          <a href="/projects" className="text-cyan-400 underline">View all my projects</a>
-          <a href="/skills" className="text-cyan-400 underline">View all my skills</a>
+          <a href="/experience" className="text-secondary-fg underline">View all my experience</a>
+          <a href="/projects" className="text-secondary-fg underline">View all my projects</a>
+          <a href="/skills" className="text-secondary-fg underline">View all my skills</a>
         </section>
       </AnimatedSection>
     </div>
