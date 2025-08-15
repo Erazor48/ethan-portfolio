@@ -1,0 +1,252 @@
+"use client"
+
+// app/about/page.tsx
+import SkillsGrid from "@/components/SkillsGrid";
+import GitHubStats from "@/components/GitHubStats";
+import { dataService } from "@/lib/services/data-service";
+import { useEffect, useState } from "react";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { githubSyncService } from "@/lib/services/github-sync";
+import AnimatedSection from "@/components/AnimatedSection";
+
+export default function About() {
+  const [personalInfo, setPersonalInfo] = useState<any>(null);
+  const [experience, setExperience] = useState<any>(null);
+  const [education, setEducation] = useState<any>(null);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [skills, setSkills] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [openAccordion, setOpenAccordion] = useState<string | null>(null);
+  const [mainSkills, setMainSkills] = useState<string[]>([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [personal, exp, edu] = await Promise.all([
+          dataService.getPersonalInfo(),
+          dataService.getExperience(),
+          dataService.getEducation()
+        ]);
+        setPersonalInfo(personal);
+        setExperience(exp);
+        setEducation(edu);
+        // Skills dynamiques (depuis GitHub)
+        try {
+          const skillsByCategory = await githubSyncService.getSkillsByCategory();
+          const programmingSkills = skillsByCategory.programming
+            .sort((a, b) => b.frequency - a.frequency)
+            .map(s => s.name);
+          setMainSkills(programmingSkills.slice(0, 3));
+        } catch (err) {
+          // Fallback local
+          const localSkills = await dataService.getSkills?.();
+          let fallback = localSkills?.programming?.slice(0, 3) || [];
+          setMainSkills(fallback);
+        }
+        // Projects (pour le projet vedette)
+        const allProjects = await dataService.getProjects?.();
+        setProjects(allProjects || []);
+        // Skills locales pour accordéon
+        setSkills(await dataService.getSkills?.());
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background p-8">
+        <h1 className="text-3xl font-bold text-secondary-fg mb-6">About me</h1>
+        <div className="animate-pulse">
+          <div className="h-4 bg-muted-primary rounded mb-4"></div>
+          <div className="h-4 bg-muted-primary rounded mb-4"></div>
+          <div className="h-4 bg-muted-primary rounded mb-4"></div>
+          <div className="h-4 bg-muted-primary rounded mb-4"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Highlights
+  const lastEducation = Array.isArray(education) ? education[0] : null;
+  const featuredProject = projects.find((p: any) => p.featured) || projects[0];
+
+  // Accordéons helpers
+  const toggleAccordion = (key: string) => {
+    setOpenAccordion(openAccordion === key ? null : key);
+  };
+
+  return (
+    <div className="min-h-screen bg-background text-primary-fg p-8">
+      <AnimatedSection delay={0.1}>
+        <section className="text-center py-10 px-4">
+          <h1 className="text-4xl font-bold mb-2">{personalInfo?.name || "Ethan Orain"}</h1>
+          <p className="text-secondary-fg text-lg mb-2">{personalInfo?.bio || "AI Engineer · NLP · Neural Networks · LLMs Enthusiast"}</p>
+          <div className="flex justify-center gap-6 mb-4 text-foreground">
+            <a href={personalInfo?.github || "https://github.com/Erazor48"} target="_blank" rel="noreferrer">GitHub</a>
+            <a href={personalInfo?.linkedin || "https://www.linkedin.com/in/ethan-orain"} target="_blank" rel="noreferrer">LinkedIn</a>
+            <a href="/CV 3-4 months EV.pdf" target="_blank" rel="noreferrer">CV</a>
+          </div>
+        </section>
+      </AnimatedSection>
+      <AnimatedSection delay={0.3}>
+        <section className="grid md:grid-cols-2 gap-8 mb-8">
+          {/* Expérience actuelle */}
+          {experience?.current && (
+            <div className="bg-card p-6 rounded-lg">
+              <h2 className="text-xl font-bold text-secondary-fg mb-2">Current Experience</h2>
+              <div className="text-primary-fg font-semibold mb-1">{experience.current.position} at {experience.current.company}</div>
+              <div className="text-muted-primary-fg mb-2">{`${experience.current.start.month}/${experience.current.start.year} – ${experience.current.ongoing ? 'Present' : (experience.current.end ? experience.current.end.month + '/' + experience.current.end.year : 'N/A')}`}</div>
+              <div className="text-card-fg mb-2 whitespace-pre-wrap">{experience.current.description}</div>
+              <div className="flex flex-wrap gap-2">
+                {experience.current.technologies?.map((tech: string) => (
+                  <span key={tech} className="bg-skills text-primary-fg px-3 py-1 rounded-full text-sm">{tech}</span>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Dernier diplôme */}
+          {lastEducation && (
+            <div className="bg-card p-6 rounded-lg">
+              <h2 className="text-xl font-bold text-secondary-fg mb-2">Last Education</h2>
+              <div className="text-primary-fg font-semibold mb-1">{lastEducation.degree} ({lastEducation.program})</div>
+              <div className="text-muted-primary-fg mb-2">{lastEducation.institution} • {`${lastEducation.start.month}/${lastEducation.start.year} – ${lastEducation.end ? lastEducation.end.month + '/' + lastEducation.end.year : 'Present'}`}</div>
+              <div className="text-card-fg mb-2 whitespace-pre-wrap">{lastEducation.description}</div>
+              <div className="flex flex-wrap gap-2">
+                {lastEducation.technologies?.map((tech: string) => (
+                  <span key={tech} className="bg-skills text-primary-fg px-3 py-1 rounded-full text-sm">{tech}</span>
+                ))}
+              </div>
+              {typeof lastEducation.grade === 'number' && (
+                <div className="text-muted-primary-fg text-sm mt-2">Grade: {lastEducation.grade}</div>
+              )}
+            </div>
+          )}
+          {/* Skills principaux */}
+          <div className="bg-card p-6 rounded-lg">
+            <h2 className="text-xl font-bold text-secondary-fg mb-2">Main Skills</h2>
+            <div className="flex flex-wrap gap-2">
+              {mainSkills.map((skill: string) => (
+                <span key={skill} className="bg-skills text-primary-fg px-3 py-1 rounded-full text-sm">{skill}</span>
+              ))}
+            </div>
+          </div>
+          {/* Projet vedette */}
+          {featuredProject && (
+            <div className="bg-card p-6 rounded-lg">
+              <h2 className="text-xl font-bold text-secondary-fg mb-2">Featured Project</h2>
+              <div className="text-primary-fg font-semibold mb-1">{featuredProject.name}</div>
+              <div className="text-card-fg mb-2 whitespace-pre-wrap">{featuredProject.description}</div>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {featuredProject.technologies?.map((tech: string) => (
+                  <span key={tech} className="bg-skills text-primary-fg px-3 py-1 rounded-full text-sm">{tech}</span>
+                ))}
+              </div>
+              {featuredProject.start && featuredProject.end && (
+                <div className="text-muted-primary-fg text-sm mb-2">
+                  {`${featuredProject.start.month}/${featuredProject.start.year} – ${featuredProject.ongoing ? 'Present' : (featuredProject.end ? featuredProject.end.month + '/' + featuredProject.end.year : 'N/A')}`}
+                </div>
+              )}
+              {featuredProject.githubUrl && (
+                <a href={featuredProject.githubUrl} target="_blank" rel="noreferrer" className="text-secondary-fg underline">GitHub</a>
+              )}
+              {featuredProject.liveUrl && (
+                <span> | <a href={featuredProject.liveUrl} target="_blank" rel="noreferrer" className="text-secondary-fg underline">Live</a></span>
+              )}
+            </div>
+          )}
+        </section>
+      </AnimatedSection>
+      <AnimatedSection delay={0.5}>
+        <section className="mb-8">
+          {/* Expériences précédentes */}
+          {experience?.previous && experience.previous.length > 0 && (
+            <div className="mb-4">
+              <button onClick={() => toggleAccordion('previousExp')} className="flex items-center text-secondary-fg font-bold mb-2">
+                Previous Experiences {openAccordion === 'previousExp' ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+              </button>
+              {openAccordion === 'previousExp' && (
+                <div className="space-y-4">
+                  {experience.previous.map((exp: any, index: number) => (
+                    <div key={index} className="bg-card p-6 rounded-lg">
+                      <div className="text-primary-fg font-semibold mb-1">{exp.position} at {exp.company}</div>
+                      <div className="text-muted-primary-fg mb-2">{`${exp.start.month}/${exp.start.year} – ${exp.ongoing ? 'Present' : (exp.end ? exp.end.month + '/' + exp.end.year : 'N/A')}`}</div>
+                      <div className="text-card-fg mb-2 whitespace-pre-wrap">{exp.description}</div>
+                      <div className="flex flex-wrap gap-2">
+                        {exp.technologies?.map((tech: string) => (
+                          <span key={tech} className="bg-skills text-primary-fg px-3 py-1 rounded-full text-sm">{tech}</span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          {/* Toutes les formations */}
+          {education && Array.isArray(education) && education.length > 1 && (
+            <div className="mb-4">
+              <button onClick={() => toggleAccordion('allEdu')} className="flex items-center text-secondary-fg font-bold mb-2">
+                All Education {openAccordion === 'allEdu' ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+              </button>
+              {openAccordion === 'allEdu' && (
+                <div className="space-y-4">
+                  {education.slice(1).map((edu: any, idx: number) => (
+                    <div key={idx} className="bg-card p-6 rounded-lg">
+                      <div className="text-primary-fg font-semibold mb-1">{edu.degree} ({edu.program})</div>
+                      <div className="text-muted-primary-fg mb-2">{edu.institution} • {`${edu.start.month}/${edu.start.year} – ${edu.end ? edu.end.month + '/' + edu.end.year : 'Present'}`}</div>
+                      <div className="text-card-fg mb-2 whitespace-pre-wrap">{edu.description}</div>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {edu.technologies?.map((tech: string) => (
+                          <span key={tech} className="bg-skills text-primary-fg px-3 py-1 rounded-full text-sm">{tech}</span>
+                        ))}
+                      </div>
+                      {typeof edu.grade === 'number' && (
+                        <div className="text-muted-primary-fg text-sm mt-2">Grade: {edu.grade}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          {/* Toutes les compétences */}
+          {skills && (
+            <div className="mb-4">
+              <button onClick={() => toggleAccordion('allSkills')} className="flex items-center text-secondary-fg font-bold mb-2">
+                All Skills {openAccordion === 'allSkills' ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+              </button>
+              {openAccordion === 'allSkills' && (
+                <div className="space-y-2">
+                  <SkillsGrid />
+                </div>
+              )}
+            </div>
+          )}
+          {/* Stats GitHub */}
+          <div className="mb-4">
+            <button onClick={() => toggleAccordion('githubStats')} className="flex items-center text-secondary-fg font-bold mb-2">
+              GitHub Statistics {openAccordion === 'githubStats' ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+            </button>
+            {openAccordion === 'githubStats' && (
+              <div className="bg-card p-6 rounded-lg">
+                <GitHubStats />
+              </div>
+            )}
+          </div>
+        </section>
+      </AnimatedSection>
+      <AnimatedSection delay={0.7}>
+        <section className="flex flex-wrap gap-4 mt-8">
+          <a href="/experience" className="text-secondary-fg underline">View all my experience</a>
+          <a href="/projects" className="text-secondary-fg underline">View all my projects</a>
+          <a href="/skills" className="text-secondary-fg underline">View all my skills</a>
+        </section>
+      </AnimatedSection>
+    </div>
+  );
+}
