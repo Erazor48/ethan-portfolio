@@ -63,9 +63,9 @@ export default function Hero() {
       <div className="relative flex flex-col items-center -mt-20 z-10">
         <div className="relative animate-fadeInUp" style={{ animationDelay: "0.1s" }}>
           <FlipImage
-          frontImage="/Profile_Pickture_Men_blue.png"
-          backImage="/Profile_Pickture_Robot.png"
-          size={144} // Optionnel
+            frontImage="/Profile_Pickture_Men_blue.png"
+            backImage="/Profile_Pickture_Robot.png"
+            size={144} // Optionnel
           />
         </div>
         <h1 className="text-4xl font-bold text-primary-fg mt-6 mb-2 drop-shadow-lg animate-fadeInUp" style={{ animationDelay: "0.3s" }}>
@@ -78,14 +78,14 @@ export default function Hero() {
           Passionate about creating robust, scalable, and innovative AI solutions. Always exploring new technologies and pushing boundaries in machine learning and software engineering.
         </p>
         <div className="flex justify-center gap-6 mb-6 text-foreground animate-fadeInUp" style={{ animationDelay: "0.9s" }}>
-          <a href={socialLinks?.github || "https://github.com/Erazor48"} target="_blank" rel="noreferrer" className="hover:scale-105">
-            <SiGithub size={25} style={{marginTop: "2px"}}/>
+          <a href={socialLinks?.github || "https://github.com/Erazor48"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">
+            <SiGithub size={25} style={{ marginTop: "2px" }} />
           </a>
-          <a href={socialLinks?.linkedin || "https://www.linkedin.com/in/ethan-orain"} target="_blank" rel="noreferrer" className="hover:scale-105">
-            <SiLinkedin size={24} style={{marginTop: "3px", marginLeft: "3px"}}/>
+          <a href={socialLinks?.linkedin || "https://www.linkedin.com/in/ethan-orain"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">
+            <SiLinkedin size={24} style={{ marginTop: "3px", marginLeft: "3px" }} />
           </a>
-          <a href="/CV 3-4 months EV.pdf" target="_blank" rel="noreferrer" className="hover:scale-105">
-            <TbFileCv size={30} style={{}}/>
+          <a href="/CV 3-4 months EV.pdf" target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">
+            <TbFileCv size={30} style={{}} />
           </a>
         </div>
         <div className="mt-8 animate-fadeInUp" style={{ animationDelay: "1.1s" }}>
