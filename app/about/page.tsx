@@ -87,9 +87,9 @@ export default function About() {
           <h1 className="text-4xl font-bold mb-2">{personalInfo?.name || "Ethan Orain"}</h1>
           <p className="text-secondary-fg text-lg mb-2">{personalInfo?.bio || "AI Engineer · NLP · Neural Networks · LLMs Enthusiast"}</p>
           <div className="flex justify-center gap-6 mb-4 text-foreground">
-            <a href={personalInfo?.github || "https://github.com/Erazor48"} target="_blank" rel="noreferrer">GitHub</a>
-            <a href={personalInfo?.linkedin || "https://www.linkedin.com/in/ethan-orain"} target="_blank" rel="noreferrer">LinkedIn</a>
-            <a href="/CV 3-4 months EV.pdf" target="_blank" rel="noreferrer">CV</a>
+            <a href={personalInfo?.github || "https://github.com/Erazor48"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">GitHub</a>
+            <a href={personalInfo?.linkedin || "https://www.linkedin.com/in/ethan-orain"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">LinkedIn</a>
+            <a href="/CV 3-4 months EV.pdf" target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">CV</a>
           </div>
         </section>
       </AnimatedSection>

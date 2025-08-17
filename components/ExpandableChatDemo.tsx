@@ -60,7 +60,7 @@ export function ExpandableChatDemo() {
           <div className="bg-chat-explanation border border-chat-explanation-border rounded-lg px-3 py-1 my-1">
             <p className="text-sm text-chat-explanation-fg">
               🤖 AI Assistant powered by LangChain
-              <br/>
+              <br />
               Data synchronized with GitHub in real-time
             </p>
           </div>
@@ -161,9 +161,9 @@ export function ExpandableChatDemo() {
                   <Mic className="size-4" />
                 </Button>
               </div>
-              <Button 
-                type="submit" 
-                size="sm" 
+              <Button
+                type="submit"
+                size="sm"
                 className="ml-auto gap-1.5"
                 disabled={isLoading || !input.trim()}
               >
