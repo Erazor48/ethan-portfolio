@@ -57,13 +57,7 @@ export function ExpandableChatDemo() {
           <p className="text-sm text-muted-primary-fg">
             Ask me questions about my skills, projects, and experience
           </p>
-          <div className="bg-chat-explanation border border-chat-explanation-border rounded-lg px-3 py-1 my-1">
-            <p className="text-sm text-chat-explanation-fg">
-              🤖 AI Assistant powered by LangChain
-              <br />
-              Data synchronized with GitHub in real-time
-            </p>
-          </div>
+
           <Button
             variant="ghost"
             size="sm"
