@@ -5,6 +5,9 @@ import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { MessageLoading } from "@/components/ui/chat/message-loading";
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+import { MarkdownRenderer } from "@/components/MarkdownRender"
 
 interface ChatBubbleProps {
   variant?: "sent" | "received"
@@ -57,6 +60,8 @@ export function ChatBubbleMessage({
         <div className="flex items-center space-x-2">
           <MessageLoading />
         </div>
+      ) : typeof children === "string" ? (
+        <MarkdownRenderer content={children}></MarkdownRenderer>
       ) : (
         children
       )}

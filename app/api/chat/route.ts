@@ -3,16 +3,16 @@ import { chatbotService } from '@/lib/services/chatbot-service';
 
 export async function POST(request: NextRequest) {
   try {
-    const { message } = await request.json();
+    const { messages } = await request.json();
 
-    if (!message || typeof message !== 'string') {
+    if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
         { error: 'Message requis' },
         { status: 400 }
       );
     }
-
-    const response = await chatbotService.generateResponse(message);
+    console.log("4:", messages);
+    const response = await chatbotService.generateResponse(messages);
 
     return NextResponse.json({ response });
   } catch (error) {

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 
 export interface ChatMessage {
   id: string;
@@ -12,7 +12,10 @@ export function useChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const sendMessage = useCallback(async (content: string) => {
+  // Ref pour éviter le premier appel automatique au montage
+  const hasMounted = useRef(false);
+
+  const sendMessage = useCallback((content: string) => {
     if (!content.trim()) return;
 
     const userMessage: ChatMessage = {
@@ -22,43 +25,66 @@ export function useChat() {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]); // 🔹 Ajout du message user
     setIsLoading(true);
     setError(null);
-
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: content }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Erreur de communication avec le serveur");
-      }
-
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      const assistantMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: data.response,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue");
-    } finally {
-      setIsLoading(false);
-    }
   }, []);
+
+  useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
+
+    if (messages.length === 0) return;
+
+    // ⚡️ Ne déclencher l’API que si le dernier message est un "user"
+    const last = messages[messages.length - 1];
+    if (last.role !== "user") return;
+
+    const sendToApi = async () => {
+      try {
+        const n = 12;
+        const lastMessages = messages.slice(-n);
+
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: lastMessages.map((m) => ({
+              role: m.role,
+              content: m.content,
+            })),
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Erreur de communication avec le serveur");
+        }
+
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        const assistantMessage: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: data.response,
+          timestamp: new Date(),
+        };
+
+        setMessages((prev) => [...prev, assistantMessage]); // 🔹 Ajout du message assistant
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Une erreur est survenue");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    sendToApi();
+  }, [messages]);
 
   const clearMessages = useCallback(() => {
     setMessages([]);
