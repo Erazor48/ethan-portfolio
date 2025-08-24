@@ -4,9 +4,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { MessageLoading } from "@/components/ui/chat/message-loading";
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
+import { MessageLoading } from "@/components/ui/chat/message-loading"
 import { MarkdownRenderer } from "@/components/MarkdownRender"
 
 interface ChatBubbleProps {
