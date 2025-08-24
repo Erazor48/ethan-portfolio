@@ -114,12 +114,6 @@ Response:`
       await this.initializeKnowledgeBase();
     }
 
-    // ✅ DEBUG : voir ce que le bot reçoit
-    console.log("🔎 DEBUG BOT INPUT:");
-    console.log("Knowledge base:", this.knowledgeBase);
-    console.log("History:", history);
-    console.log("Last user message:", lastUserMessage);
-
     const chain = RunnableSequence.from([
       {
         knowledgeBase: () => this.knowledgeBase,

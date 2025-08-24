@@ -51,7 +51,7 @@ export default function Hero() {
   return (
     <section className="relative w-full overflow-hidden bg-gradient-bottom pb-16">
       {/* Poster */}
-      <div className="w-full h-[320px] relative">
+      <div className="w-full h-[20vh] mb-[10vh] sm:h-[25vh] sm:mb-[5vh] md:h-[35vh] lg:h-[50vh] relative">
         <img
           src="/Poster_AI_Blue_Light_Weight.png"
           alt="Blue AI Poster"
