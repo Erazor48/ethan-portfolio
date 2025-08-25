@@ -1,5 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react"
+import { MarkdownRenderer } from "@/components/MarkdownRender"
 
 export default function AnimatedSection({
   children,
@@ -29,14 +30,14 @@ export function TypewriterMessage({ content, speed = 20 }: { content: string; sp
       setDisplayed(content.slice(0, i + 1))
       i++
       if (i >= content.length) clearInterval(interval)
-    }, speed) // vitesse d’écriture (ms par caractère)
+    }, speed)
 
     return () => clearInterval(interval)
   }, [content, speed])
 
   return (
     <div className="whitespace-pre-line relative animate-fadeInUp">
-      {displayed}
+      <MarkdownRenderer content={displayed} />
     </div>
   )
 }
