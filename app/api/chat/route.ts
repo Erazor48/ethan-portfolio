@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.log("4:", messages);
+
     const response = await chatbotService.generateResponse(messages);
 
     return NextResponse.json({ response });
