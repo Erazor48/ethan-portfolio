@@ -95,7 +95,7 @@ Conversation history:
 {history}
 
 Instructions:
-1. Respond in the user’s language, but default to English when possible.
+1. Respond in the user’s language, but default is English.
 2. Keep answers concise and clear (3–6 sentences max unless more detail is explicitly asked).
 3. Be natural and conversational, avoid unnecessary filler text.
 4. Use the knowledge base when relevant.
