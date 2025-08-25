@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/chat/expandable-chat"
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list"
 import { useChat } from "@/components/hooks/useChat"
+import { TypewriterMessage } from "./AnimatedSection"
 
 export function ExpandableChatDemo() {
   const { messages, isLoading, error, sendMessage, clearMessages } = useChat()
@@ -33,12 +34,17 @@ export function ExpandableChatDemo() {
 
   const handleAttachFile = () => {
     // File attachment functionality
-    console.log("Attach file")
+    //console.log("Attach file");
+    alert("Attachement file is not programated for the moment. \n\
+You can maybe descrybe your doc for the moment.")
   }
 
   const handleMicrophoneClick = () => {
     // Voice recording functionality
-    console.log("Voice recording")
+    //console.log("Voice recording")
+    alert("Voice recording is not currently available. \n\
+We are working to make it available as soon as possible. \n\
+Your voice is important to us.")
   }
 
   const handleClearChat = () => {
@@ -71,27 +77,36 @@ export function ExpandableChatDemo() {
 
         <ExpandableChatBody>
           <ChatMessageList>
-            {messages.map((message) => (
-              <ChatBubble
-                key={message.id}
-                variant={message.role === 'user' ? 'sent' : 'received'}
-              >
-                <ChatBubbleAvatar
-                  className="h-8 w-8 shrink-0"
-                  src={
-                    message.role === 'user'
-                      ? "/Profile_Pickture_Women_Anime.png"
-                      : "/Profile_Pickture_Men_Anime.png"
-                  }
-                  fallback={message.role === 'user' ? 'You' : 'EO'}
-                />
-                <ChatBubbleMessage
-                  variant={message.role === 'user' ? 'sent' : 'received'}
+            {messages.map((message, idx) => {
+              const isLast = idx === messages.length - 1
+
+              return (
+                <ChatBubble
+                  key={message.id}
+                  variant={message.role === "user" ? "sent" : "received"}
                 >
-                  {message.content}
-                </ChatBubbleMessage>
-              </ChatBubble>
-            ))}
+                  <ChatBubbleAvatar
+                    className="h-8 w-8 shrink-0"
+                    src={
+                      message.role === "user"
+                        ? "/Profile_Pickture_Women_Anime.png"
+                        : "/Profile_Pickture_Men_Anime.png"
+                    }
+                    fallback={message.role === "user" ? "You" : "EO"}
+                  />
+
+                  <ChatBubbleMessage
+                    variant={message.role === "user" ? "sent" : "received"}
+                  >
+                    {isLast && message.role !== "user" ? (
+                      <TypewriterMessage content={message.content} />
+                    ) : (
+                      message.content
+                    )}
+                  </ChatBubbleMessage>
+                </ChatBubble>
+              )
+            })}
 
             {isLoading && (
               <ChatBubble variant="received">
@@ -112,9 +127,7 @@ export function ExpandableChatDemo() {
                   fallback="EO"
                 />
                 <ChatBubbleMessage variant="received">
-                  <div className="text-destructive-fg text-sm">
-                    Error: {error}
-                  </div>
+                  <div className="text-destructive-fg text-sm">Error: {error}</div>
                 </ChatBubbleMessage>
               </ChatBubble>
             )}
@@ -132,6 +145,12 @@ export function ExpandableChatDemo() {
               placeholder="Ask a question about my skills, projects, or experience..."
               className="min-h-12 resize-none rounded-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
               disabled={isLoading}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault(); // empêche le retour à la ligne
+                  handleSubmit(e);    // appelle ton submit
+                }
+              }}
             />
             <div className="flex items-center p-3 pt-0 justify-between">
               <div className="flex">
