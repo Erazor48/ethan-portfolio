@@ -76,7 +76,7 @@ Your voice is important to us.")
         </ExpandableChatHeader>
 
         <ExpandableChatBody>
-          <ChatMessageList>
+          <ChatMessageList resetKey={messages.length} smooth followWhileGrowing>
             {messages.map((message, idx) => {
               const isLast = idx === messages.length - 1
 
@@ -189,4 +189,4 @@ Your voice is important to us.")
       </ExpandableChat>
     </div>
   )
-} 
+}

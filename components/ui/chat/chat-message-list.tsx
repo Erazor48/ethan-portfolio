@@ -5,10 +5,16 @@ import { useAutoScroll } from "@/components/hooks/use-auto-scroll";
 
 interface ChatMessageListProps extends React.HTMLAttributes<HTMLDivElement> {
   smooth?: boolean;
+  resetKey?: unknown;
+  followWhileGrowing?: boolean;
 }
 
 const ChatMessageList = React.forwardRef<HTMLDivElement, ChatMessageListProps>(
-  ({ className, children, smooth = false, ...props }, _ref) => {
+  (
+    { className, children, smooth = false, resetKey, followWhileGrowing = true, ...props },
+    _ref,
+  ) => {
+    const contentContainerRef = React.useRef<HTMLDivElement>(null);
     const {
       scrollRef,
       isAtBottom,
@@ -18,6 +24,9 @@ const ChatMessageList = React.forwardRef<HTMLDivElement, ChatMessageListProps>(
     } = useAutoScroll({
       smooth,
       content: children,
+      resetKey,
+      followWhileGrowing,
+      contentRef: contentContainerRef,
     });
 
     return (
@@ -29,7 +38,7 @@ const ChatMessageList = React.forwardRef<HTMLDivElement, ChatMessageListProps>(
           onTouchMove={disableAutoScroll}
           {...props}
         >
-          <div className="flex flex-col gap-6">{children}</div>
+          <div className="flex flex-col gap-6" ref={contentContainerRef}>{children}</div>
         </div>
 
         {!isAtBottom && (
