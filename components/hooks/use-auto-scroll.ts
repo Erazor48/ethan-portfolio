@@ -9,10 +9,23 @@ interface UseAutoScrollOptions {
   offset?: number;
   smooth?: boolean;
   content?: React.ReactNode;
+  // When this key changes, auto-scroll is re-enabled and we jump to bottom
+  resetKey?: unknown;
+  // Keep following bottom while content height grows (e.g., typewriter)
+  followWhileGrowing?: boolean;
+  // Element containing the growing content to observe size changes
+  contentRef?: React.RefObject<HTMLElement>;
 }
 
 export function useAutoScroll(options: UseAutoScrollOptions = {}) {
-  const { offset = 20, smooth = false, content } = options;
+  const {
+    offset = 20,
+    smooth = false,
+    content,
+    resetKey,
+    followWhileGrowing = true,
+    contentRef,
+  } = options;
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastContentHeight = useRef(0);
   const userHasScrolled = useRef(false);
@@ -86,14 +99,42 @@ export function useAutoScroll(options: UseAutoScrollOptions = {}) {
     const hasNewContent = currentHeight !== lastContentHeight.current;
 
     if (hasNewContent) {
-      if (scrollState.autoScrollEnabled) {
+      if (scrollState.autoScrollEnabled && followWhileGrowing) {
         requestAnimationFrame(() => {
           scrollToBottom(lastContentHeight.current === 0);
         });
       }
       lastContentHeight.current = currentHeight;
     }
-  }, [content, scrollState.autoScrollEnabled, scrollToBottom]);
+  }, [content, scrollState.autoScrollEnabled, scrollToBottom, followWhileGrowing]);
+
+  // Observe content container size changes (works even if parent does not re-render)
+  useEffect(() => {
+    if (!contentRef?.current) return;
+    const target = contentRef.current;
+    let previousHeight = target.scrollHeight;
+
+    const resizeObserver = new ResizeObserver(() => {
+      const newHeight = target.scrollHeight;
+      const grew = newHeight > previousHeight;
+      previousHeight = newHeight;
+      if (grew && scrollState.autoScrollEnabled && followWhileGrowing) {
+        // smooth or auto depending on hook option
+        scrollToBottom(false);
+      }
+    });
+
+    resizeObserver.observe(target);
+    return () => resizeObserver.disconnect();
+  }, [contentRef, scrollState.autoScrollEnabled, followWhileGrowing, scrollToBottom]);
+
+  // Re-enable auto-scroll when resetKey changes (e.g., new message sent)
+  useEffect(() => {
+    if (!scrollRef.current) return;
+    setScrollState({ isAtBottom: true, autoScrollEnabled: true });
+    // Jump to bottom instantly on reset to avoid visible jump
+    scrollToBottom(true);
+  }, [resetKey, scrollToBottom]);
 
   useEffect(() => {
     const element = scrollRef.current;
