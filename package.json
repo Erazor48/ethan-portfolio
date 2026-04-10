@@ -4,12 +4,11 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
-        "start": "next start",
-        "test:tokens": "node scripts/test-tokens.js"
+        "start": "next start"
     },
     "dependencies": {
         "@huggingface/inference": "^4.3.2",
-        "@langchain/community": "^0.3.48",
+        "@langchain/community": "^0.3.53",
         "@langchain/core": "^0.3.62",
         "@langchain/google-genai": "^0.2.16",
         "@langchain/openai": "^0.5.18",
@@ -18,11 +17,14 @@
         "autoprefixer": "^10.4.21",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
-        "langchain": "^0.3.29",
+        "exceljs": "^4.4.0",
+        "langchain": "^0.3.31",
         "lucide-react": "^0.525.0",
+        "mammoth": "^1.10.0",
         "mui": "^0.0.1",
         "next": "^15.4.6",
         "next-intl": "^4.3.1",
+        "pdf-parse": "^1.1.1",
         "postcss": "^8.5.6",
         "react": "18.2.0",
         "react-dom": "18.2.0",
@@ -31,11 +33,15 @@
         "remark-gfm": "^4.0.1",
         "tailwind-merge": "^3.3.1",
         "tailwindcss": "^3.4.17",
-        "tailwindcss-animate": "^1.0.7"
+        "tailwindcss-animate": "^1.0.7",
+        "tesseract.js": "^6.0.1",
+        "zod": "^3.25.76"
     },
     "devDependencies": {
         "@types/node": "24.0.7",
+        "@types/pdfjs-dist": "^2.10.377",
         "@types/react": "19.1.8",
+        "patch-package": "^8.0.0",
         "typescript": "5.8.3"
     }
 }

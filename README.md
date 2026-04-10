@@ -14,6 +14,7 @@ Personal portfolio with an AI chatbot powered by LangChain and automatic GitHub 
 ## 🛠️ Architecture
 
 ### Data Structure
+
 ```
 lib/
 ├── data/
@@ -37,17 +38,19 @@ lib/
 
 ## 📦 Installation
 
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
 ## 🔧 Configuration
 
 1. Create a `.env.local` file:
    ```env
-OPENAI_API_KEY=your_openai_api_key_here
-GITHUB_TOKEN=your_github_token_here
-```
+   OPENAI_API_KEY=your_openai_api_key_here
+   GITHUB_TOKEN=your_github_token_here
+   ```
+
+````
 
 2. Update your personal data in `lib/data/personal-data.ts`
 
@@ -55,7 +58,7 @@ GITHUB_TOKEN=your_github_token_here
 
    ```bash
    npm run dev
-   ```
+````
 
 ## 📊 Chatbot Features
 
@@ -67,6 +70,7 @@ GITHUB_TOKEN=your_github_token_here
 ## 🔄 GitHub Synchronization
 
 The system automatically retrieves:
+
 - GitHub projects with descriptions and technologies
 - Programming languages used
 - Project statistics (stars, forks)
@@ -82,10 +86,12 @@ The system automatically retrieves:
 ## 🔧 Customization
 
 ### Adding New Data
+
 1. Modify `lib/data/personal-data.ts`
 2. The chatbot will automatically have access to new information
 
 ### Adding New Sources
+
 1. Create a new service in `lib/services/`
 2. Integrate it into `DataService`
 
@@ -102,4 +108,4 @@ The system automatically retrieves:
 2. Create a feature branch
 3. Commit your changes
 4. Push to the branch
-5. Open a Pull Request 
+5. Open a Pull Request
