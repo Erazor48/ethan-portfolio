@@ -1,8 +1,8 @@
 import React from 'react';
 
 const FlipImage = ({
-  frontImage = '/Profile_Pickture_Men_blue.png',
-  backImage = '/Profile_Pickture_Robot.png',
+  frontImage = '/img/profile/Men_blue.png',
+  backImage = '/img/profile/Robot.png',
   size = 144,
 }) => {
   const containerSize = `${size}px`;
