@@ -2,25 +2,29 @@
 
 // components/Hero.tsx
 import { TbFileCv } from "react-icons/tb";
-import { SiGithub, SiLinkedin } from "react-icons/si";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { dataService } from "@/lib/services/data-service";
 import { useEffect, useState } from "react";
 import FlipImage from "@/components/FlipImage";
+import { ScrollVideo } from "@/components/ScrollVideo";
 
 export default function Hero() {
   const [personalInfo, setPersonalInfo] = useState<any>(null);
   const [socialLinks, setSocialLinks] = useState<any>(null);
+  const [cv, setCV] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [personal, social] = await Promise.all([
+        const [personal, social, cv] = await Promise.all([
           dataService.getPersonalInfo(),
-          dataService.getSocialLinks()
+          dataService.getSocialLinks(),
+          dataService.getCV()
         ]);
         setPersonalInfo(personal);
         setSocialLinks(social);
+        setCV(cv);
       } catch (error) {
         console.error('Error loading hero data:', error);
       } finally {
@@ -53,7 +57,7 @@ export default function Hero() {
       {/* Poster */}
       <div className="w-full h-[20vh] mb-[10vh] sm:h-[25vh] sm:mb-[5vh] md:h-[35vh] lg:h-[50vh] relative">
         <img
-          src="/Poster_AI_Blue_Light_Weight.png"
+          src="/img/poster/Poster_AI_Blue_Light_Weight.png"
           alt="Blue AI Poster"
           className="inset-0 w-full h-full object-cover object-center"
         />
@@ -63,8 +67,8 @@ export default function Hero() {
       <div className="relative flex flex-col items-center -mt-20 z-10">
         <div className="relative animate-fadeInUp" style={{ animationDelay: "0.1s" }}>
           <FlipImage
-            frontImage="/Profile_Pickture_Men_blue.png"
-            backImage="/Profile_Pickture_Robot.png"
+            frontImage="/img/profile/Men_blue.png"
+            backImage="/img/profile/Robot.png"
             size={144} // Optionnel
           />
         </div>
@@ -78,13 +82,13 @@ export default function Hero() {
           Passionate about creating robust, scalable, and innovative AI solutions. Always exploring new technologies and pushing boundaries in machine learning and software engineering.
         </p>
         <div className="flex justify-center gap-6 mb-6 text-foreground animate-fadeInUp" style={{ animationDelay: "0.9s" }}>
-          <a href={socialLinks?.github || "https://github.com/Erazor48"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">
-            <SiGithub size={25} style={{ marginTop: "2px" }} />
+          <a href={socialLinks.github || "https://github.com/Erazor48"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">
+            <FaGithub size={25} style={{ marginTop: "2px" }} />
           </a>
-          <a href={socialLinks?.linkedin || "https://www.linkedin.com/in/ethan-orain"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">
-            <SiLinkedin size={24} style={{ marginTop: "3px", marginLeft: "3px" }} />
+          <a href={socialLinks.linkedin || "https://www.linkedin.com/in/ethan-orain"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">
+            <FaLinkedin size={24} style={{ marginTop: "3px", marginLeft: "3px" }} />
           </a>
-          <a href="/CV 3-4 months EV.pdf" target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">
+          <a href={cv.url || "/pdf/CV/theme/dark/3-4 months EV official.pdf"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">
             <TbFileCv size={30} style={{}} />
           </a>
         </div>
@@ -94,6 +98,19 @@ export default function Hero() {
           </a>
         </div>
       </div>
+
+
+      <ScrollVideo
+        totalFrames={485}
+        framePath={(i) =>
+          `/frames/frame_${String(i).padStart(4, "0")}.webp`
+        }
+        startOffset={-500}   // commence 400px avant
+        endOffset={-100}     // finit 400px après
+        fadeDistance={0.2}  // fade 20%
+      />
+
+
     </section>
   );
 }
