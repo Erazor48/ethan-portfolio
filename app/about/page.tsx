@@ -13,6 +13,8 @@ export default function About() {
   const [personalInfo, setPersonalInfo] = useState<any>(null);
   const [experience, setExperience] = useState<any>(null);
   const [education, setEducation] = useState<any>(null);
+  const [socialLinks, setSocialLinks] = useState<any>(null);
+  const [cv, setCV] = useState<any>(null);
   const [projects, setProjects] = useState<any[]>([]);
   const [skills, setSkills] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -22,14 +24,18 @@ export default function About() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [personal, exp, edu] = await Promise.all([
+        const [personal, exp, edu, social, cv] = await Promise.all([
           dataService.getPersonalInfo(),
           dataService.getExperience(),
-          dataService.getEducation()
+          dataService.getEducation(),
+          dataService.getSocialLinks(),
+          dataService.getCV()
         ]);
         setPersonalInfo(personal);
         setExperience(exp);
         setEducation(edu);
+        setSocialLinks(social);
+        setCV(cv);
         // Skills dynamiques (depuis GitHub)
         try {
           const skillsByCategory = await githubSyncService.getSkillsByCategory();
@@ -87,9 +93,9 @@ export default function About() {
           <h1 className="text-4xl font-bold mb-2">{personalInfo?.name || "Ethan Orain"}</h1>
           <p className="text-secondary-fg text-lg mb-2">{personalInfo?.bio || "AI Engineer · NLP · Neural Networks · LLMs Enthusiast"}</p>
           <div className="flex justify-center gap-6 mb-4 text-foreground">
-            <a href={personalInfo?.github || "https://github.com/Erazor48"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">GitHub</a>
-            <a href={personalInfo?.linkedin || "https://www.linkedin.com/in/ethan-orain"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">LinkedIn</a>
-            <a href="/CV 3-4 months EV.pdf" target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">CV</a>
+            <a href={socialLinks.github || "https://github.com/Erazor48"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">GitHub</a>
+            <a href={socialLinks.linkedin || "https://www.linkedin.com/in/ethan-orain"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">LinkedIn</a>
+            <a href={cv.url || "/pdf/CV/theme/dark/3-4 months EV official.pdf"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">CV</a>
           </div>
         </section>
       </AnimatedSection>
