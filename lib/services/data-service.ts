@@ -62,6 +62,11 @@ export class DataService {
     return data.social;
   }
 
+  async getCV() {
+    const data = await this.getPersonalData();
+    return data.cv;
+  }
+
   async searchProjects(query: string) {
     const projects = await this.getProjects();
     const searchTerm = query.toLowerCase();

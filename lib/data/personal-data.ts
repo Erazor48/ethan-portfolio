@@ -76,6 +76,10 @@ export interface PersonalData {
     linkedin: string;
     portfolio: string;
   };
+
+  cv: {
+    url: string; // lien vers le PDF
+  };
 }
 
 export const personalData: PersonalData = {
@@ -263,5 +267,9 @@ Giskard can help secure these models through automated testing and vulnerability
     github: "https://github.com/Erazor48",
     linkedin: "https://www.linkedin.com/in/ethan-orain",
     portfolio: "https://ethan-portfolio-xi.vercel.app",
+  },
+
+  cv: {
+    url: "/pdf/CV/theme/dark/3-4 months EV official.pdf",
   },
 }; 
