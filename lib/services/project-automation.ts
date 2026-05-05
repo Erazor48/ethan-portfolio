@@ -31,7 +31,7 @@ export class ProjectAutomationService {
 
     try {
       const githubProjects = await githubSyncService.fetchGitHubProjects(username);
-      
+
       return githubProjects.map(project => ({
         id: project.name,
         name: project.name,
@@ -61,7 +61,7 @@ export class ProjectAutomationService {
   async getProjectsByTechnology(technology: string): Promise<AutomatedProject[]> {
     const projects = await this.getAutomatedProjects();
     const tech = technology.toLowerCase();
-    
+
     return projects.filter(project =>
       project.technologies.some(t => t.toLowerCase().includes(tech)) ||
       project.topics.some(topic => topic.toLowerCase().includes(tech))
@@ -82,18 +82,17 @@ export class ProjectAutomationService {
     topTechnologies: string[];
   }> {
     const projects = await this.getAutomatedProjects();
-    
+
     const totalStars = projects.reduce((sum, p) => sum + p.stars, 0);
     const totalForks = projects.reduce((sum, p) => sum + p.forks, 0);
-    
-    // Get top technologies
+
     const techCount: Record<string, number> = {};
     projects.forEach(project => {
       project.technologies.forEach(tech => {
         techCount[tech] = (techCount[tech] || 0) + 1;
       });
     });
-    
+
     const topTechnologies = Object.entries(techCount)
       .sort(([,a], [,b]) => b - a)
       .map(([tech]) => tech);
@@ -107,8 +106,7 @@ export class ProjectAutomationService {
 
   async syncWithPersonalData(): Promise<PersonalData> {
     const automatedProjects = await this.getAutomatedProjects();
-    
-    // Convert automated projects to personal data format
+
     const projects = automatedProjects.map(project => ({
       id: project.id,
       name: project.name,
@@ -126,4 +124,4 @@ export class ProjectAutomationService {
   }
 }
 
-export const projectAutomationService = ProjectAutomationService.getInstance(); 
+export const projectAutomationService = ProjectAutomationService.getInstance();

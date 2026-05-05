@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, FormEvent } from "react"
-import { Send, Bot, Paperclip, Mic, CornerDownLeft, RotateCcw } from "lucide-react"
+import { useRef, useState, FormEvent } from "react"
+import { Send, Bot, Paperclip, Mic, CornerDownLeft, RotateCcw, Square } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   ChatBubble,
@@ -22,6 +22,10 @@ import { TypewriterMessage } from "./AnimatedSection"
 export function ExpandableChatDemo() {
   const { messages, isLoading, error, sendMessage, clearMessages } = useChat()
   const [input, setInput] = useState("")
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
+  const [isRecording, setIsRecording] = useState(false)
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -32,19 +36,92 @@ export function ExpandableChatDemo() {
     await sendMessage(message)
   }
 
-  const handleAttachFile = () => {
-    // File attachment functionality
-    //console.log("Attach file");
-    alert("Attachement file is not programated for the moment. \n\
-You can maybe descrybe your doc for the moment.")
+  const openFilePicker = () => fileInputRef.current?.click()
+
+  const onFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    console.log('Files selected:', Array.from(files).map(f => `${f.name} (${f.size} bytes, ${f.type})`))
+
+    try {
+      const form = new FormData()
+      Array.from(files).forEach(f => {
+        console.log('Adding file to form:', f.name)
+        form.append('files', f)
+      })
+
+      console.log('Sending to /api/ingest/file...')
+      const res = await fetch('/api/ingest/file', { method: 'POST', body: form })
+      console.log('Response status:', res.status)
+
+      if (!res.ok) {
+        const errorText = await res.text()
+        console.error('Upload failed:', errorText)
+        throw new Error(`Upload failed (${res.status}): ${errorText}`)
+      }
+
+      const data = await res.json()
+      console.log('Upload success:', data)
+      await sendMessage(`I've attached ${data.ingested} document(s). Please consider them in your next answer.`)
+    } catch (err) {
+      console.error('Upload error:', err)
+      alert(`Upload failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
+    } finally {
+      e.target.value = ''
+    }
   }
 
-  const handleMicrophoneClick = () => {
-    // Voice recording functionality
-    //console.log("Voice recording")
-    alert("Voice recording is not currently available. \n\
-We are working to make it available as soon as possible. \n\
-Your voice is important to us.")
+  const handleAttachFile = () => {
+    if (isLoading) return
+    openFilePicker()
+  }
+
+  const handleMicrophoneClick = async () => {
+    if (isRecording) {
+      mediaRecorderRef.current?.stop()
+      setIsRecording(false)
+      return
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const mr = new MediaRecorder(stream)
+      audioChunksRef.current = []
+      mr.ondataavailable = (ev) => {
+        if (ev.data.size > 0) audioChunksRef.current.push(ev.data)
+      }
+      mr.onstop = async () => {
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+        const form = new FormData()
+        form.append('audio', blob, 'recording.webm')
+        try {
+          const res = await fetch('/api/transcribe', { method: 'POST', body: form })
+          if (!res.ok) throw new Error('Transcription failed')
+          const data = await res.json()
+          const text: string = data.text || ''
+          if (text.trim()) {
+            await fetch('/api/ingest/text', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ title: 'Voice note', content: text })
+            })
+            await sendMessage(`I have a new voice transcript. Please take it into account.`)
+          } else {
+            alert('No speech detected.')
+          }
+        } catch (e) {
+          alert('Transcription failed. Check OPENAI_API_KEY and model availability.')
+        } finally {
+          stream.getTracks().forEach(t => t.stop())
+        }
+      }
+      mediaRecorderRef.current = mr
+      mr.start()
+      setIsRecording(true)
+    } catch (err) {
+      alert('Microphone permission denied or not available.')
+    }
   }
 
   const handleClearChat = () => {
@@ -52,7 +129,15 @@ Your voice is important to us.")
   }
 
   return (
-    <div className="h-[600px] relative">
+    <div className="relative">
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        accept=".txt,.md,.pdf,.docx,.xlsx,.xls,.csv,.png,.jpg,.jpeg,text/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/*"
+        className="hidden"
+        onChange={onFileSelected}
+      />
       <ExpandableChat
         size="lg"
         position="bottom-right"
@@ -89,8 +174,8 @@ Your voice is important to us.")
                     className="h-8 w-8 shrink-0"
                     src={
                       message.role === "user"
-                        ? "/Profile_Pickture_Women_Anime.png"
-                        : "/Profile_Pickture_Men_Anime.png"
+                        ? "/img/profile/Women_Anime.png"
+                        : "/img/profile/Men_Anime.png"
                     }
                     fallback={message.role === "user" ? "You" : "EO"}
                   />
@@ -112,7 +197,7 @@ Your voice is important to us.")
               <ChatBubble variant="received">
                 <ChatBubbleAvatar
                   className="h-8 w-8 shrink-0"
-                  src="/Profile_Pickture_Men_Anime.png"
+                  src="/img/profile/Men_Anime.png"
                   fallback="EO"
                 />
                 <ChatBubbleMessage isLoading />
@@ -123,7 +208,7 @@ Your voice is important to us.")
               <ChatBubble variant="received">
                 <ChatBubbleAvatar
                   className="h-8 w-8 shrink-0"
-                  src="/Profile_Pickture_Men_Anime.png"
+                  src="/img/profile/Men_Anime.png"
                   fallback="EO"
                 />
                 <ChatBubbleMessage variant="received">
@@ -165,13 +250,14 @@ Your voice is important to us.")
                 </Button>
 
                 <Button
-                  variant="ghost"
+                  variant={isRecording ? 'destructive' : 'ghost'}
                   size="icon"
                   type="button"
                   onClick={handleMicrophoneClick}
                   disabled={isLoading}
+                  title={isRecording ? 'Stop recording' : 'Start recording'}
                 >
-                  <Mic className="size-4" />
+                  {isRecording ? <Square className="size-4" /> : <Mic className="size-4" />}
                 </Button>
               </div>
               <Button
