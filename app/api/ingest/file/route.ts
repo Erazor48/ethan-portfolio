@@ -5,7 +5,6 @@ import mammoth from 'mammoth'
 import ExcelJS from 'exceljs'
 import pdf from 'pdf-parse'
 import Tesseract from 'tesseract.js'
-import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export const runtime = 'nodejs'
 

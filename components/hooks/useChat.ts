@@ -7,8 +7,15 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
+const WELCOME_MESSAGE: ChatMessage = {
+  id: "welcome",
+  role: "assistant",
+  content: "Hi! I'm Ethan's AI assistant. Ask me anything about his **skills**, **projects**, **experience**, or **background** — I'm here to help!",
+  timestamp: new Date(),
+};
+
 export function useChat() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -87,7 +94,7 @@ export function useChat() {
   }, [messages]);
 
   const clearMessages = useCallback(() => {
-    setMessages([]);
+    setMessages([WELCOME_MESSAGE]);
     setError(null);
   }, []);
 

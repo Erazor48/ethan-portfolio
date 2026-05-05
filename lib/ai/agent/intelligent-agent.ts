@@ -1,6 +1,7 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { RunnableSequence } from '@langchain/core/runnables';
 import { StringOutputParser } from '@langchain/core/output_parsers';
+import { HumanMessage, AIMessage } from '@langchain/core/messages';
 import { mcpTools } from '../tools/mcp-tools';
 import { webTools } from '../tools/web-tools';
 import { ingestTools } from '../tools/ingest-tools';
@@ -30,7 +31,6 @@ export class IntelligentAgent {
     async initialize(): Promise<void> {
         if (this.isInitialized) return;
 
-        // Initialiser le RAG seulement s'il n'est pas déjà initialisé
         if (!ragSystem.isInitialized) {
             await ragSystem.initialize();
         }
@@ -45,6 +45,11 @@ export class IntelligentAgent {
 
         const lastUserMessage = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
 
+        // Build conversation history (all messages except the last user message)
+        const history = messages.slice(0, -1).map(m =>
+            m.role === 'user' ? new HumanMessage(m.content) : new AIMessage(m.content)
+        );
+
         try {
             const relevantContext = await ragSystem.getRelevantContext(lastUserMessage);
             const toolsList = [...mcpTools, ...webTools, ...ingestTools];
@@ -53,6 +58,7 @@ export class IntelligentAgent {
                 {
                     context: () => relevantContext,
                     tools: () => toolsList.map(tool => `${tool.name}: ${tool.description}`).join('\n'),
+                    history: () => history,
                     input: () => lastUserMessage,
                 },
                 mainAgentPrompt,
@@ -68,6 +74,7 @@ export class IntelligentAgent {
             const fallbackChain = RunnableSequence.from([
                 {
                     context: () => fallbackContext,
+                    history: () => history,
                     input: () => lastUserMessage,
                 },
                 fallbackPrompt,
