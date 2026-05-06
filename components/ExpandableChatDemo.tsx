@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState, FormEvent } from "react"
-import { Send, Bot, Paperclip, Mic, CornerDownLeft, RotateCcw, Square } from "lucide-react"
+import { Bot, Paperclip, Mic, CornerDownLeft, RotateCcw, Square, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   ChatBubble,
@@ -18,115 +18,134 @@ import {
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list"
 import { useChat } from "@/components/hooks/useChat"
 import { TypewriterMessage } from "./AnimatedSection"
+import { MarkdownRenderer } from "./MarkdownRender"
 
 export function ExpandableChatDemo() {
   const { messages, isLoading, error, sendMessage, clearMessages } = useChat()
   const [input, setInput] = useState("")
+  const [isUploading, setIsUploading] = useState(false)
+  const [isRecording, setIsRecording] = useState(false)
+  const [isTranscribing, setIsTranscribing] = useState(false)
+
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
-  const [isRecording, setIsRecording] = useState(false)
 
+  // ── Text submit ────────────────────────────────────────────────────────────
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
-
     const message = input.trim()
     setInput("")
-    await sendMessage(message)
+    sendMessage(message)
   }
 
-  const openFilePicker = () => fileInputRef.current?.click()
+  // ── File attachment ────────────────────────────────────────────────────────
+  const handleAttachFile = () => {
+    if (isLoading || isUploading) return
+    fileInputRef.current?.click()
+  }
 
   const onFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
 
-    console.log('Files selected:', Array.from(files).map(f => `${f.name} (${f.size} bytes, ${f.type})`))
-
+    setIsUploading(true)
     try {
       const form = new FormData()
-      Array.from(files).forEach(f => {
-        console.log('Adding file to form:', f.name)
-        form.append('files', f)
-      })
+      const fileNames = Array.from(files).map(f => f.name)
+      Array.from(files).forEach(f => form.append('files', f))
 
-      console.log('Sending to /api/ingest/file...')
       const res = await fetch('/api/ingest/file', { method: 'POST', body: form })
-      console.log('Response status:', res.status)
 
       if (!res.ok) {
-        const errorText = await res.text()
-        console.error('Upload failed:', errorText)
-        throw new Error(`Upload failed (${res.status}): ${errorText}`)
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error || `Server error ${res.status}`)
       }
 
       const data = await res.json()
-      console.log('Upload success:', data)
-      await sendMessage(`I've attached ${data.ingested} document(s). Please consider them in your next answer.`)
+
+      if (data.ingested === 0) {
+        throw new Error('No content could be extracted from the file(s).')
+      }
+
+      // Include filenames so the bot knows what was shared
+      const names = fileNames.join(', ')
+      sendMessage(
+        `I've shared ${data.ingested} file(s) with you: ${names}. Please consider their content in your next answer.`
+      )
     } catch (err) {
-      console.error('Upload error:', err)
-      alert(`Upload failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
+      const msg = err instanceof Error ? err.message : 'Unknown error'
+      sendMessage(`⚠️ File upload failed: ${msg}`)
     } finally {
+      setIsUploading(false)
       e.target.value = ''
     }
   }
 
-  const handleAttachFile = () => {
-    if (isLoading) return
-    openFilePicker()
-  }
-
+  // ── Microphone ─────────────────────────────────────────────────────────────
   const handleMicrophoneClick = async () => {
+    // Stop recording
     if (isRecording) {
       mediaRecorderRef.current?.stop()
       setIsRecording(false)
       return
     }
 
+    // Start recording
+    let stream: MediaStream
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const mr = new MediaRecorder(stream)
-      audioChunksRef.current = []
-      mr.ondataavailable = (ev) => {
-        if (ev.data.size > 0) audioChunksRef.current.push(ev.data)
-      }
-      mr.onstop = async () => {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    } catch {
+      alert('Microphone permission denied or not available.')
+      return
+    }
+
+    const mr = new MediaRecorder(stream)
+    audioChunksRef.current = []
+
+    mr.ondataavailable = (ev) => {
+      if (ev.data.size > 0) audioChunksRef.current.push(ev.data)
+    }
+
+    mr.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop())
+      setIsTranscribing(true)
+
+      try {
         const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
         const form = new FormData()
         form.append('audio', blob, 'recording.webm')
-        try {
-          const res = await fetch('/api/transcribe', { method: 'POST', body: form })
-          if (!res.ok) throw new Error('Transcription failed')
-          const data = await res.json()
-          const text: string = data.text || ''
-          if (text.trim()) {
-            await fetch('/api/ingest/text', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ title: 'Voice note', content: text })
-            })
-            await sendMessage(`I have a new voice transcript. Please take it into account.`)
-          } else {
-            alert('No speech detected.')
-          }
-        } catch (e) {
-          alert('Transcription failed. Check OPENAI_API_KEY and model availability.')
-        } finally {
-          stream.getTracks().forEach(t => t.stop())
+
+        const res = await fetch('/api/transcribe', { method: 'POST', body: form })
+
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}))
+          throw new Error(body.error || `Transcription error ${res.status}`)
         }
+
+        const { text } = await res.json()
+
+        if (text?.trim()) {
+          // Put transcript in the input field so the user can review and send
+          setInput(text.trim())
+        } else {
+          alert('No speech detected. Please try again.')
+        }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Unknown error'
+        alert(`Transcription failed: ${msg}`)
+      } finally {
+        setIsTranscribing(false)
       }
-      mediaRecorderRef.current = mr
-      mr.start()
-      setIsRecording(true)
-    } catch (err) {
-      alert('Microphone permission denied or not available.')
     }
+
+    mediaRecorderRef.current = mr
+    mr.start()
+    setIsRecording(true)
   }
 
-  const handleClearChat = () => {
-    clearMessages()
-  }
+  const busy = isLoading || isUploading || isTranscribing
 
   return (
     <div className="relative">
@@ -134,27 +153,18 @@ export function ExpandableChatDemo() {
         ref={fileInputRef}
         type="file"
         multiple
-        accept=".txt,.md,.pdf,.docx,.xlsx,.xls,.csv,.png,.jpg,.jpeg,text/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/*"
+        accept=".txt,.md,.pdf,.docx,.xlsx,.xls,.csv,.png,.jpg,.jpeg,text/*,application/pdf"
         className="hidden"
         onChange={onFileSelected}
       />
-      <ExpandableChat
-        size="lg"
-        position="bottom-right"
-        icon={<Bot className="h-6 w-6" />}
-      >
+
+      <ExpandableChat size="lg" position="bottom-right" icon={<Bot className="h-6 w-6" />}>
         <ExpandableChatHeader className="flex-col text-center justify-center">
           <h1 className="text-xl font-semibold">Chat with Ethan ✨</h1>
           <p className="text-sm text-muted-primary-fg">
-            Ask me questions about my skills, projects, and experience
+            Ask me anything about my skills, projects, and experience
           </p>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleClearChat}
-            className="mt-2 text-xs"
-          >
+          <Button variant="ghost" size="sm" onClick={clearMessages} className="mt-2 text-xs">
             <RotateCcw className="h-3 w-3 mr-1" />
             Clear Chat
           </Button>
@@ -164,27 +174,25 @@ export function ExpandableChatDemo() {
           <ChatMessageList resetKey={messages.length} smooth followWhileGrowing>
             {messages.map((message, idx) => {
               const isLast = idx === messages.length - 1
+              const isAssistant = message.role === "assistant"
 
               return (
                 <ChatBubble
                   key={message.id}
-                  variant={message.role === "user" ? "sent" : "received"}
+                  variant={isAssistant ? "received" : "sent"}
                 >
                   <ChatBubbleAvatar
                     className="h-8 w-8 shrink-0"
-                    src={
-                      message.role === "user"
-                        ? "/img/profile/Women_Anime.png"
-                        : "/img/profile/Men_Anime.png"
-                    }
-                    fallback={message.role === "user" ? "You" : "EO"}
+                    src={isAssistant ? "/img/profile/Men_Anime.png" : "/img/profile/Women_Anime.png"}
+                    fallback={isAssistant ? "EO" : "You"}
                   />
-
-                  <ChatBubbleMessage
-                    variant={message.role === "user" ? "sent" : "received"}
-                  >
-                    {isLast && message.role !== "user" ? (
-                      <TypewriterMessage content={message.content} />
+                  <ChatBubbleMessage variant={isAssistant ? "received" : "sent"}>
+                    {isAssistant ? (
+                      isLast ? (
+                        <TypewriterMessage content={message.content} />
+                      ) : (
+                        <MarkdownRenderer content={message.content} />
+                      )
                     ) : (
                       message.content
                     )}
@@ -193,24 +201,44 @@ export function ExpandableChatDemo() {
               )
             })}
 
+            {/* Loading indicator */}
             {isLoading && (
               <ChatBubble variant="received">
-                <ChatBubbleAvatar
-                  className="h-8 w-8 shrink-0"
-                  src="/img/profile/Men_Anime.png"
-                  fallback="EO"
-                />
+                <ChatBubbleAvatar className="h-8 w-8 shrink-0" src="/img/profile/Men_Anime.png" fallback="EO" />
                 <ChatBubbleMessage isLoading />
               </ChatBubble>
             )}
 
+            {/* Upload indicator */}
+            {isUploading && (
+              <ChatBubble variant="received">
+                <ChatBubbleAvatar className="h-8 w-8 shrink-0" src="/img/profile/Men_Anime.png" fallback="EO" />
+                <ChatBubbleMessage variant="received">
+                  <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Reading your file…
+                  </span>
+                </ChatBubbleMessage>
+              </ChatBubble>
+            )}
+
+            {/* Transcription indicator */}
+            {isTranscribing && (
+              <ChatBubble variant="received">
+                <ChatBubbleAvatar className="h-8 w-8 shrink-0" src="/img/profile/Men_Anime.png" fallback="EO" />
+                <ChatBubbleMessage variant="received">
+                  <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Transcribing your voice…
+                  </span>
+                </ChatBubbleMessage>
+              </ChatBubble>
+            )}
+
+            {/* Error display */}
             {error && (
               <ChatBubble variant="received">
-                <ChatBubbleAvatar
-                  className="h-8 w-8 shrink-0"
-                  src="/img/profile/Men_Anime.png"
-                  fallback="EO"
-                />
+                <ChatBubbleAvatar className="h-8 w-8 shrink-0" src="/img/profile/Men_Anime.png" fallback="EO" />
                 <ChatBubbleMessage variant="received">
                   <div className="text-destructive-fg text-sm">Error: {error}</div>
                 </ChatBubbleMessage>
@@ -220,6 +248,14 @@ export function ExpandableChatDemo() {
         </ExpandableChatBody>
 
         <ExpandableChatFooter>
+          {/* Recording indicator bar */}
+          {isRecording && (
+            <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-red-500 bg-red-50 dark:bg-red-950/20 border-b">
+              <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+              Recording… tap the mic to stop
+            </div>
+          )}
+
           <form
             onSubmit={handleSubmit}
             className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring p-1"
@@ -227,47 +263,64 @@ export function ExpandableChatDemo() {
             <ChatInput
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask a question about my skills, projects, or experience..."
+              placeholder={
+                isRecording ? 'Recording…' :
+                isTranscribing ? 'Transcribing…' :
+                isUploading ? 'Processing file…' :
+                'Ask a question about my skills, projects, or experience…'
+              }
               className="min-h-12 resize-none rounded-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
-              disabled={isLoading}
+              disabled={busy}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault(); // empêche le retour à la ligne
-                  handleSubmit(e);    // appelle ton submit
+                  e.preventDefault()
+                  handleSubmit(e)
                 }
               }}
             />
+
             <div className="flex items-center p-3 pt-0 justify-between">
-              <div className="flex">
+              <div className="flex gap-1">
+                {/* Attach file */}
                 <Button
                   variant="ghost"
                   size="icon"
                   type="button"
                   onClick={handleAttachFile}
-                  disabled={isLoading}
+                  disabled={busy}
+                  title="Attach a file (PDF, Word, Excel, image, text…)"
                 >
-                  <Paperclip className="size-4" />
+                  {isUploading
+                    ? <Loader2 className="size-4 animate-spin" />
+                    : <Paperclip className="size-4" />
+                  }
                 </Button>
 
+                {/* Microphone */}
                 <Button
                   variant={isRecording ? 'destructive' : 'ghost'}
                   size="icon"
                   type="button"
                   onClick={handleMicrophoneClick}
-                  disabled={isLoading}
-                  title={isRecording ? 'Stop recording' : 'Start recording'}
+                  disabled={isLoading || isUploading || isTranscribing}
+                  title={isRecording ? 'Stop recording' : 'Record a voice note'}
                 >
-                  {isRecording ? <Square className="size-4" /> : <Mic className="size-4" />}
+                  {isTranscribing
+                    ? <Loader2 className="size-4 animate-spin" />
+                    : isRecording
+                      ? <Square className="size-4" />
+                      : <Mic className="size-4" />
+                  }
                 </Button>
               </div>
+
               <Button
                 type="submit"
                 size="sm"
                 className="ml-auto gap-1.5"
-                disabled={isLoading || !input.trim()}
+                disabled={busy || !input.trim()}
               >
-                {isLoading ? 'Sending...' : 'Send'}
-                <CornerDownLeft className="size-3.5" />
+                {isLoading ? <><Loader2 className="size-3 animate-spin" /> Sending…</> : <>Send <CornerDownLeft className="size-3.5" /></>}
               </Button>
             </div>
           </form>
