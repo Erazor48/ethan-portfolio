@@ -7,6 +7,11 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
+export interface FileContext {
+  name: string;
+  preview: string;
+}
+
 const WELCOME_MESSAGE: ChatMessage = {
   id: "welcome",
   role: "assistant",
@@ -19,11 +24,14 @@ export function useChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Ref pour éviter le premier appel automatique au montage
   const hasMounted = useRef(false);
+  // File contexts to inject into the next API call (not stored in message history)
+  const pendingFileContextsRef = useRef<FileContext[]>([]);
 
-  const sendMessage = useCallback((content: string) => {
+  const sendMessage = useCallback((content: string, fileContexts?: FileContext[]) => {
     if (!content.trim()) return;
+
+    pendingFileContextsRef.current = fileContexts ?? [];
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -32,7 +40,7 @@ export function useChat() {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]); // 🔹 Ajout du message user
+    setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
     setError(null);
   }, []);
@@ -45,24 +53,33 @@ export function useChat() {
 
     if (messages.length === 0) return;
 
-    // ⚡️ Ne déclencher l’API que si le dernier message est un "user"
     const last = messages[messages.length - 1];
     if (last.role !== "user") return;
 
     const sendToApi = async () => {
       try {
+        const fileContexts = pendingFileContextsRef.current;
+
         const n = 12;
         const lastMessages = messages.slice(-n);
+
+        // Build the API payload — inject file content directly into the last user message.
+        // This is more reliable than relying on the RAG singleton being shared across routes.
+        const apiMessages = lastMessages.map((m, i) => {
+          const isLastMsg = i === lastMessages.length - 1;
+          if (isLastMsg && fileContexts.length > 0) {
+            const fileBlock = fileContexts
+              .map(f => `\n\n[Content of uploaded file "${f.name}"]\n${f.preview}\n[End of "${f.name}"]`)
+              .join('');
+            return { role: m.role, content: m.content + fileBlock };
+          }
+          return { role: m.role, content: m.content };
+        });
 
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            messages: lastMessages.map((m) => ({
-              role: m.role,
-              content: m.content,
-            })),
-          }),
+          body: JSON.stringify({ messages: apiMessages }),
         });
 
         if (!response.ok) {
@@ -82,7 +99,7 @@ export function useChat() {
           timestamp: new Date(),
         };
 
-        setMessages((prev) => [...prev, assistantMessage]); // 🔹 Ajout du message assistant
+        setMessages((prev) => [...prev, assistantMessage]);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Une erreur est survenue");
       } finally {
@@ -96,6 +113,7 @@ export function useChat() {
   const clearMessages = useCallback(() => {
     setMessages([WELCOME_MESSAGE]);
     setError(null);
+    pendingFileContextsRef.current = [];
   }, []);
 
   return {

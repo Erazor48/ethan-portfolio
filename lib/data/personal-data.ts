@@ -86,7 +86,7 @@ export const personalData: PersonalData = {
   personal: {
     name: "Ethan Orain",
     user_name: "Erazor_48",
-    age: 21,
+    age: 22,
     location: "Paris, France",
     email: "ethan.orain@aivancity.education",
     bio: "AI Engineer · NLP · Neural Networks · LLMs Enthusiast",

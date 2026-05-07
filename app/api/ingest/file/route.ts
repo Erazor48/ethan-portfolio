@@ -5,6 +5,8 @@ import { extractTextFromFile } from '@/lib/ingestion/extract-text';
 export const runtime = 'nodejs';
 
 const MAX_FILE_MB = 10;
+// Preview sent back to client so the chat can inject it directly into the prompt
+const PREVIEW_CHARS = 3_000;
 
 export async function POST(req: NextRequest) {
     try {
@@ -20,7 +22,7 @@ export async function POST(req: NextRequest) {
         }
 
         let ingested = 0;
-        const results: { name: string; status: string }[] = [];
+        const results: { name: string; status: string; preview?: string }[] = [];
 
         for (const file of files) {
             const sizeMb = file.size / (1024 * 1024);
@@ -45,7 +47,9 @@ export async function POST(req: NextRequest) {
                     temporary: true,
                 });
 
-                results.push({ name: file.name, status: 'ok' });
+                // Return the first PREVIEW_CHARS so the client can inject content
+                // directly into the chat API payload (more reliable than RAG lookup alone)
+                results.push({ name: file.name, status: 'ok', preview: text.slice(0, PREVIEW_CHARS) });
                 ingested++;
             } catch (err) {
                 const msg = err instanceof Error ? err.message : 'Unknown error';

@@ -121,9 +121,18 @@ export class RAGSystem {
 
     // Add a single document dynamically
     async addDocument(doc: RAGDocument): Promise<void> {
+        // Remove previous version of the same user-uploaded file to avoid duplicates
+        if (doc.metadata.temporary && doc.metadata.title) {
+            const before = this.documents.length;
+            this.documents = this.documents.filter(
+                d => !(d.metadata.temporary && d.metadata.title === doc.metadata.title)
+            );
+            if (this.documents.length < before) {
+                console.log(`RAG: Replaced duplicate "${doc.metadata.title}"`);
+            }
+        }
         this.documents.push(doc);
-        console.log(`RAG: Added document "${doc.metadata.title || doc.metadata.id}" (${doc.content.length} chars, type: ${doc.metadata.type})`);
-        console.log(`RAG: Total documents: ${this.documents.length}`);
+        console.log(`RAG: Added "${doc.metadata.title || doc.metadata.id}" (${doc.content.length} chars). Total: ${this.documents.length}`);
     }
 
     // Add multiple documents dynamically
