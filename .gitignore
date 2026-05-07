@@ -46,3 +46,8 @@ next-env.d.ts
 docs
 public/video
 test/html
+
+# generated/binary assets
+eng.traineddata
+dev-server.log
+Mermaid.js
