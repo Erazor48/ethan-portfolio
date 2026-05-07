@@ -1,3 +1,11 @@
+function calculateAge(birthDate: Date): number {
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+  return age;
+}
+
 export interface PersonalData {
   // Informations personnelles
   personal: {
@@ -78,7 +86,8 @@ export interface PersonalData {
   };
 
   cv: {
-    url: string; // lien vers le PDF
+    dark: string;
+    light: string;
   };
 }
 
@@ -86,7 +95,7 @@ export const personalData: PersonalData = {
   personal: {
     name: "Ethan Orain",
     user_name: "Erazor_48",
-    age: 22,
+    age: calculateAge(new Date(2004, 3, 11)),
     location: "Paris, France",
     email: "ethan.orain@aivancity.education",
     bio: "AI Engineer · NLP · Neural Networks · LLMs Enthusiast",
@@ -270,6 +279,7 @@ Giskard can help secure these models through automated testing and vulnerability
   },
 
   cv: {
-    url: "/pdf/CV/theme/dark/3-4 months EV official.pdf",
+    dark: "/pdf/CV/theme/dark/3-4 months EV official.pdf",
+    light: "/pdf/CV/theme/light/3-4 months EV official.pdf",
   },
 }; 

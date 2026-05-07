@@ -20,6 +20,15 @@ export default function About() {
   const [loading, setLoading] = useState(true);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const [mainSkills, setMainSkills] = useState<string[]>([]);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    setIsDark(html.classList.contains('dark'));
+    const observer = new MutationObserver(() => setIsDark(html.classList.contains('dark')));
+    observer.observe(html, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -95,7 +104,7 @@ export default function About() {
           <div className="flex justify-center gap-6 mb-4 text-foreground">
             <a href={socialLinks.github || "https://github.com/Erazor48"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">GitHub</a>
             <a href={socialLinks.linkedin || "https://www.linkedin.com/in/ethan-orain"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">LinkedIn</a>
-            <a href={cv.url || "/pdf/CV/theme/dark/3-4 months EV official.pdf"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">CV</a>
+            <a href={isDark ? cv.dark : cv.light} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">CV</a>
           </div>
         </section>
       </AnimatedSection>

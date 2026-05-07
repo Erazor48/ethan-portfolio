@@ -13,6 +13,15 @@ export default function Hero() {
   const [socialLinks, setSocialLinks] = useState<any>(null);
   const [cv, setCV] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    setIsDark(html.classList.contains('dark'));
+    const observer = new MutationObserver(() => setIsDark(html.classList.contains('dark')));
+    observer.observe(html, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -88,7 +97,7 @@ export default function Hero() {
           <a href={socialLinks.linkedin || "https://www.linkedin.com/in/ethan-orain"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">
             <FaLinkedin size={24} style={{ marginTop: "3px", marginLeft: "3px" }} />
           </a>
-          <a href={cv.url || "/pdf/CV/theme/dark/3-4 months EV official.pdf"} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">
+          <a href={isDark ? cv.dark : cv.light} target="_blank" rel="noreferrer" className="hover:scale-105 hover:text-foreground-secondary">
             <TbFileCv size={30} style={{}} />
           </a>
         </div>
