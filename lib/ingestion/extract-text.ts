@@ -7,7 +7,7 @@ import Tesseract from 'tesseract.js';
 // serverExternalPackages in next.config.ts is the belt; this is the suspenders.
 async function parsePdf(buffer: Buffer): Promise<string> {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string }>;
+    const pdfParse = require('pdf-parse/lib/pdf-parse.js') as (buf: Buffer) => Promise<{ text: string }>;
     const data = await pdfParse(buffer);
     return data.text.trim();
 }
