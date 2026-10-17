@@ -32,6 +32,26 @@ export class ProjectAutomationService {
     try {
       const githubProjects = await githubSyncService.fetchGitHubProjects(username);
 
+      // GitHub unreachable or rate-limited (60 req/h per IP without a token) and no
+      // cached data: fall back to the static project list instead of returning nothing.
+      if (githubProjects.length === 0) {
+        return personalData.projects
+          .filter(project => project.githubUrl)
+          .map(project => ({
+            id: project.id,
+            name: project.name,
+            description: project.description,
+            technologies: project.technologies,
+            githubUrl: project.githubUrl as string,
+            liveUrl: project.liveUrl,
+            featured: Boolean(project.featured),
+            stars: 0,
+            forks: 0,
+            lastUpdated: '',
+            topics: [],
+          }));
+      }
+
       return githubProjects.map(project => ({
         id: project.name,
         name: project.name,
