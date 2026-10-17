@@ -202,7 +202,6 @@ Also studied Engineering Sciences as a third specialization.",
 Personal project to build a 3D object generator, aiming to become a SaaS platform with project thread management.\n\
 Currently in early development — learning React for frontend work after gaining backend & API experience.",
       technologies: ["FastAPI", "SQLAlchemy", "React", "Tailwind CSS", "Batch Files"],
-      githubUrl: "https://github.com/Erazor48/Eviverse",
       featured: true,
       start: { month: "04", year: "2025" },
       end: null,
@@ -253,7 +252,6 @@ adjust volume in a clean, intuitive UI. Ideal for learning Python GUI and audio 
 large language models (LLMs) to understand their vulnerabilities. We also presented how the open-source tool \
 Giskard can help secure these models through automated testing and vulnerability detection.",
       technologies: ["Prompt Injection", "LLM Security", "Giskard", "AI Safety"],
-      githubUrl: "https://github.com/Erazor48/prompt-injection-giskard",
       featured: true,
       start: { month: "03", year: "2025" },
       end: { month: "03", year: "2025" },

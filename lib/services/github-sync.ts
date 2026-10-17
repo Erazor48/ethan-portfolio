@@ -123,8 +123,12 @@ export function categorizeSkill(skill: string): string {
 
 export class GitHubSyncService {
   private static instance: GitHubSyncService;
-  private cache: Map<string, any> = new Map();
-  private cacheExpiry = 5 * 60 * 1000; // 5 minutes
+  // Last good result per username, kept even when expired so we can serve it
+  // if GitHub rate-limits us (60 req/h per IP without a token).
+  private cache: Map<string, { data: GitHubProject[]; timestamp: number }> = new Map();
+  // Coalesces concurrent calls: one request can trigger several syncs.
+  private inflight: Map<string, Promise<GitHubProject[]>> = new Map();
+  private cacheExpiry = 60 * 60 * 1000; // 1 hour
 
   static getInstance(): GitHubSyncService {
     if (!GitHubSyncService.instance) {
@@ -136,65 +140,68 @@ export class GitHubSyncService {
   async fetchGitHubProjects(username: string): Promise<GitHubProject[]> {
     const cacheKey = `github_projects_${username}`;
     const cached = this.cache.get(cacheKey);
-    
+
     if (cached && Date.now() - cached.timestamp < this.cacheExpiry) {
       return cached.data;
     }
 
+    const pending = this.inflight.get(cacheKey);
+    if (pending) return pending;
+
+    const request = this.loadGitHubProjects(username, cacheKey, cached?.data).finally(() => {
+      this.inflight.delete(cacheKey);
+    });
+    this.inflight.set(cacheKey, request);
+    return request;
+  }
+
+  private async loadGitHubProjects(
+    username: string,
+    cacheKey: string,
+    stale: GitHubProject[] | undefined
+  ): Promise<GitHubProject[]> {
     try {
-      const headers: HeadersInit = {
-        'Accept': 'application/vnd.github.mercy-preview+json',
+      const headers: Record<string, string> = {
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
         'User-Agent': 'Ethan-Portfolio-App'
       };
 
-      // Ajouter le token d'authentification si disponible
+      // Optional token: raises the limit from 60 to 5000 requests/hour.
       const githubToken = process.env.GITHUB_TOKEN;
       if (githubToken) {
-        headers['Authorization'] = `token ${githubToken}`;
+        headers['Authorization'] = `Bearer ${githubToken}`;
       }
 
-      // 1. Récupérer la liste des repos
-      const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=20`, {
-        headers
-      });
+      // One single request. The repository list already includes `topics`,
+      // so no per-repo call is needed (it used to cost 1 + N requests).
+      // `revalidate` lets Next.js share the response across serverless instances.
+      const response = await fetch(
+        `https://api.github.com/users/${username}/repos?type=owner&sort=updated&per_page=100`,
+        { headers, next: { revalidate: 3600 } }
+      );
 
       if (!response.ok) {
         if (response.status === 401) {
-          console.warn('GitHub token invalide ou manquant. Utilisation des données publiques uniquement.');
-        } else if (response.status === 403) {
-          console.warn('Limite de taux GitHub atteinte. Utilisation des données publiques uniquement.');
+          console.warn('GitHub token invalide. Utilisation des dernières données connues.');
+        } else if (response.status === 403 || response.status === 429) {
+          console.warn('Limite de taux GitHub atteinte. Utilisation des dernières données connues.');
         } else {
-          throw new Error(`GitHub API error: ${response.status}`);
+          console.warn(`GitHub API error: ${response.status}. Utilisation des dernières données connues.`);
         }
-        return [];
+        return stale ?? [];
       }
-      
-      const projects: GitHubProject[] = await response.json();
 
-      // 2. Pour chaque repo, enrichir avec les topics via /repos/:owner/:repo
-      const enrichedProjects = await Promise.all(projects.map(async (project) => {
-        try {
-          const repoResp = await fetch(`https://api.github.com/repos/${username}/${project.name}`, { headers });
-          if (repoResp.ok) {
-            const repoData = await repoResp.json();
-            return { ...project, topics: repoData.topics || [] };
-          }
-        } catch (err) {
-          // ignore, fallback to original project
-        }
-        return { ...project, topics: project.topics || [] };
-      }));
+      const repos: GitHubProject[] = await response.json();
+      const projects = repos
+        .filter((repo: any) => !repo.fork && !repo.archived)
+        .map((repo) => ({ ...repo, topics: repo.topics || [] }));
 
-      // Cache the results
-      this.cache.set(cacheKey, {
-        data: enrichedProjects,
-        timestamp: Date.now()
-      });
-      
-      return enrichedProjects;
+      this.cache.set(cacheKey, { data: projects, timestamp: Date.now() });
+      return projects;
     } catch (error) {
       console.error('Error fetching GitHub projects:', error);
-      return [];
+      return stale ?? [];
     }
   }
 
@@ -266,7 +273,8 @@ export class GitHubSyncService {
     const updatedProjects = personalData.projects.map(project => {
       const githubProject = githubProjects.find(gp => 
         gp.name.toLowerCase() === project.name.toLowerCase() ||
-        gp.html_url === project.githubUrl
+        gp.name.toLowerCase() === project.id.toLowerCase() ||
+        gp.html_url.toLowerCase() === (project.githubUrl || '').toLowerCase()
       );
       
       if (githubProject) {
@@ -282,9 +290,16 @@ export class GitHubSyncService {
     });
 
     // Ajouter les nouveaux projets GitHub
-    const existingProjectNames = personalData.projects.map(p => p.name.toLowerCase());
+    // A repo is already listed if its name, the project id or the GitHub URL matches
+    // (display names such as "Music Player" differ from the repo name "Music_Player").
+    const existingKeys = new Set<string>();
+    personalData.projects.forEach(p => {
+      existingKeys.add(p.name.toLowerCase());
+      existingKeys.add(p.id.toLowerCase());
+      if (p.githubUrl) existingKeys.add(p.githubUrl.toLowerCase());
+    });
     const newProjects = githubProjects
-      .filter(gp => !existingProjectNames.includes(gp.name.toLowerCase()))
+      .filter(gp => !existingKeys.has(gp.name.toLowerCase()) && !existingKeys.has(gp.html_url.toLowerCase()))
       .map(gp => ({
         id: gp.name,
         name: gp.name,
